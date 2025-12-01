@@ -13,7 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Screens
 import SplashScreen from './src/screens/Splash/SplashScreen';
-import WelcomeCarouselScreen from './src/screens/WelcomeCarouselScreen';
+import WelcomeCarouselScreen from './src/screens/WelcomeCarousel/WelcomeCarouselScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import StartJourneyScreen from './src/screens/StartJourneyScreen';
 
