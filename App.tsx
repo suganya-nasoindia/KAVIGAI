@@ -4,42 +4,72 @@
  *
  * @format
  */
+import React from 'react';
+import { StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+// Screens
+import SplashScreen from './src/screens/Splash/SplashScreen';
+import WelcomeCarouselScreen from './src/screens/WelcomeCarouselScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import StartJourneyScreen from './src/screens/StartJourneyScreen';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+export type RootStackParamList = {
+  Splash: undefined;
+  WelcomeCarousel: undefined;
+  Login: undefined;
+  StartJourney: undefined;
+};
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar backgroundColor="#4682B4" barStyle="light-content" />
+
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={headerStyles}>
+            {/* Splash screen */}
+            <Stack.Screen 
+              name="Splash" 
+              component={SplashScreen} 
+              options={{ headerShown: false }} 
+            />
+
+            {/* Welcome Carousel */}
+            <Stack.Screen 
+              name="WelcomeCarousel" 
+              component={WelcomeCarouselScreen} 
+              options={{ headerShown: false }} 
+            />
+
+            {/* Login */}
+            <Stack.Screen 
+              name="Login" 
+              component={LoginScreen} 
+              options={{ title: 'Login' }} 
+            />
+
+            {/* Start Your Journey page */}
+            <Stack.Screen 
+              name="StartJourney" 
+              component={StartJourneyScreen} 
+              options={{ headerShown: false }} 
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default App;
+const headerStyles = {
+  headerStyle: { backgroundColor: '#4682B4' },
+  headerTitleStyle: { color: '#fff' },
+  headerTintColor: '#fff',
+};
