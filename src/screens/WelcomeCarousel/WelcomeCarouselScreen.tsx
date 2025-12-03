@@ -4,35 +4,41 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
-  Dimensions,
+  Dimensions,TouchableOpacity,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
-import { carouselData } from '../models/WelcomeCarouselModal';
-import { useWelcomeController } from '../controllers/WelcomeController';
+import { carouselData } from './WelcomeCarouselModal';
+import { useWelcomeController } from './WelcomeController';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeCarousel() {
-  const { currentIndex, onNext, onSnapToItem } = useWelcomeController(
+  const { currentIndex, onSnapToItem } = useWelcomeController(
     carouselData,
-    4000 // autoplay interval
+    4000
   );
 
   return (
     <View style={styles.container}>
+      
+      {/* Carousel */}
       <Carousel
         width={width}
-        height={500}
+        height={height * 0.9}   // image + text inside image occupies 90%
         data={carouselData}
         autoPlay
         autoPlayInterval={4000}
         onSnapToItem={onSnapToItem}
         renderItem={({ item }) => (
           <View style={styles.slide}>
+            {/* IMAGE */}
             <Image source={item.image} style={styles.image} resizeMode="contain" />
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.description}>{item.description}</Text>
+
+            {/* TEXT INSIDE WHITE CURVE */}
+            <View style={styles.overlayTextContainer}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+            </View>
           </View>
         )}
       />
@@ -46,51 +52,70 @@ export default function WelcomeCarousel() {
           />
         ))}
       </View>
-
-      {/* Next / Start Button */}
-      <TouchableOpacity onPress={onNext} style={styles.nextButton}>
-        <Text style={styles.nextText}>
-          {currentIndex === carouselData.length - 1 ? 'Start' : 'Next'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.bottomSection}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.buttonText}>Login</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.footerContainer}>
+                <Text style={styles.footerText}>© Nasotech LLC, 2007-2024. All rights reserved.</Text>
+            </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#ebebeb' },
 
   slide: {
+    width: '100%',
     alignItems: 'center',
-    marginTop: 40,
-    paddingHorizontal: 20,
   },
 
   image: {
-    width: width * 0.8,
-    height: 250,
-    marginBottom: 25,
+    width: width,
+    height: height * 0.85,   // IMAGE TAKES 55% screen height
   },
 
+  overlayTextContainer: {
+    position: 'absolute',
+    bottom: height * 0.10,   // pushes text UP inside white curve
+    width: '90%',
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  bottomSection: {
+    flex: 0.5,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    bottom:height * 0.05,
+    marginBottom:10,
+    paddingHorizontal: 50,
+},
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
+    color: '#F16821',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
 
   description: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    color: '#555',
-    paddingHorizontal: 15,
+    color: '#4682B4',
+    width: '85%',
   },
 
-  /* Pagination */
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 15,
+    marginBottom: 10,
+    bottom:height * 0.10,
   },
 
   dot: {
@@ -102,22 +127,34 @@ const styles = StyleSheet.create({
   },
 
   activeDot: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4682B4',
   },
 
-  /* Button */
-  nextButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-    alignSelf: 'center',
-    marginTop: 25,
-  },
+  button: {
+    backgroundColor: '#4682B4',
+    padding: 10,
+    borderRadius: 8,
+    width: 120,
+    marginLeft:10,
+    height:45,
+    alignItems: 'center',
+    marginVertical: 30,
+},
+buttonText: {
+    color: 'white',
+    fontSize: 18,
+},
+footerContainer: {
+    alignItems: 'center',
+    bottom:height * 0.01,
+    marginBottom:1,
+    alignContent:'center',
+    alignSelf:'center',
+},
+footerText: {
+    fontSize: 12,
+    color: '#4682B4',
+    textAlign: 'center',
+},
 
-  nextText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
 });
