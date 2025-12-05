@@ -13,7 +13,7 @@ import { useWelcomeController } from './WelcomeController';
 const { width, height } = Dimensions.get('window');
 
 export default function WelcomeCarousel() {
-  const { currentIndex, onSnapToItem } = useWelcomeController(
+  const { currentIndex, onSnapToItem,navigation} = useWelcomeController(
     carouselData,
     4000
   );
@@ -61,7 +61,7 @@ export default function WelcomeCarousel() {
                 </TouchableOpacity>
             </View>
             <View style={styles.footerContainer}>
-                <Text style={styles.footerText}>© Nasotech LLC, 2007-2024. All rights reserved.</Text>
+                <Text style={styles.footerText}>© Nasotech LLC, 2007-2026. All rights reserved.</Text>
             </View>
     </View>
   );

@@ -1,5 +1,5 @@
 import ApiClient from "../../services/api/ApiClient";
-import { API_ENDPOINTS } from "../../services/api/endpoints";
+import API_ENDPOINTS  from "../../services/api/endpoints";
 
 export interface VersionInfo {
   versionCode: number | null;
@@ -36,7 +36,7 @@ export const fetchVersionInfo = async (): Promise<VersionInfo> => {
   }
 
   const contentArray = response.data?.data?.content ?? [];
-
+ 
   return {
     versionCode: contentArray[0]?.versionCode ?? null,
     versionString: contentArray[0]?.versionString ?? null,

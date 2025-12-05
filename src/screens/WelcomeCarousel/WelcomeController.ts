@@ -26,5 +26,5 @@ export const useWelcomeController = (data: any[], interval = 4000) => {
 
   const onSnapToItem = (index: number) => setCurrentIndex(index);
 
-  return { currentIndex, onNext, onSnapToItem };
+  return { currentIndex, onNext, onSnapToItem,navigation };
 };

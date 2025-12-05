@@ -10,12 +10,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider } from 'react-redux';
+import store from './src/redux/reactstore';
 
 // Screens
 import SplashScreen from './src/screens/Splash/SplashScreen';
 import WelcomeCarouselScreen from './src/screens/WelcomeCarousel/WelcomeCarouselScreen';
-import LoginScreen from './src/screens/LoginScreen';
+import LoginScreen from './src/modules/Login/LoginScreen';
 import StartJourneyScreen from './src/screens/StartJourneyScreen';
+import { Provider as PaperProvider } from 'react-native-paper';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -28,8 +33,15 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
+    <Provider store={store}>
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
+
+      <PaperProvider
+            settings={{
+              icon: (props) => <MaterialCommunityIcons {...props} />,
+            }}
+          >
         <StatusBar backgroundColor="#4682B4" barStyle="light-content" />
 
         <NavigationContainer>
@@ -52,7 +64,7 @@ export default function App() {
             <Stack.Screen 
               name="Login" 
               component={LoginScreen} 
-              options={{ title: 'Login' }} 
+              options={{ headerShown: false }} 
             />
 
             {/* Start Your Journey page */}
@@ -63,8 +75,10 @@ export default function App() {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        </PaperProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
+    </Provider>
   );
 }
 
