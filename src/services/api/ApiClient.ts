@@ -43,7 +43,16 @@ export const POSTMethod = async <T>(
       ...customHeaders,
     };
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const url = `${BASE_URL}${endpoint}`;
+
+    // 🔵 Log Outgoing Request
+    console.log("====== POST REQUEST ======");
+    console.log("URL:", url);
+    console.log("Headers:", headers);
+    console.log("Body:", body);
+
+
+    const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -51,20 +60,41 @@ export const POSTMethod = async <T>(
 
     // Handle invalid / no JSON or empty response
     const text = await response.text();
+
+    // 🔵 Log Raw Response
+    console.log("====== RAW RESPONSE TEXT ======");
+    console.log(text);
+
     const json = text ? JSON.parse(text) : {};
 
+    // 🔵 Log Parsed JSON
+    console.log("====== PARSED RESPONSE JSON ======");
+    console.log(json);
+
     if (!response.ok) {
-      return {
+      const errorResponse = {
         success: false,
         error: json?.message || json?.error || "Request failed",
       };
-    }
 
-    return {
+      console.log("====== FINAL ERROR RESPONSE ======");
+      console.log(errorResponse);
+
+      return errorResponse;
+    }
+    const successResponse = {
       success: true,
-      data: json as T,
+      data: json,
     };
+
+    console.log("====== FINAL SUCCESS RESPONSE ======");
+    console.log(successResponse);
+
+    return successResponse;
   } catch (error: any) {
+    console.log("====== FETCH ERROR ======");
+    console.log(error);
+
     return {
       success: false,
       error: error.message || "Network error",

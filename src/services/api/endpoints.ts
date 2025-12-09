@@ -1,9 +1,34 @@
 
 const API_ENDPOINTS = {
-  LOGIN:  "loginhandler",
+  LOGIN:  "login",
   VERSION_CHECK:  "versionchecker",
   OTP_VERIFY:  "otphandler",
-  USER_PROFILE:  "userhandler",
+    END_POINT_REGISTER: 'register',
+    END_POINT_FORGOT_PASSWORD: 'forgotpassword',
+    END_POINT_GET_EVENT_HANDLER: 'eventhandler',
+    END_POINT_GET_BOOKS_HANDLER: 'bookhandler',
+    END_POINT_GET_MEETINGS_HANDLER: 'meetinghandler',
+    END_POINT_GET_WEBSITES_HANDLER: 'websitehandler',
+    END_POINT_GET_TODO_HANDLER: 'todohandler',
+    END_POINT_GET_FOOD_HANDLER: 'foodhandler',
+    END_POINT_GET_EXERCISE_HANDLER: 'exercisehandler',
+    END_POINT_USER_HANDLER: 'userhandler',
+    END_POINT_GET_MEDICATION_HANDLER: 'medicationhandler',
+    END_POINT_GET_TODAY_HANDLER: 'todayhandler',
+    END_POINT_GET_GOAL_HANDLER: 'goalhandler',
+    END_POINT_GET_MEASURE_HANDLER: 'measurehandler',
+    END_POINT_RESET_PASSWORD: 'resetpassword',
+    END_POINT_SERVICES_HANDLER: 'servicehandler',
+    END_POINT_GOAL_TEMPLATE_HANDLER: 'goaltemplatehandler',
+    END_POINT_CONFIRM_USER: 'confirmaccount',
+    END_POINT_MYMENTOR_HANDLER: 'mymentorhandler',
+    END_POINT_SUBSCRIPTION_HANDLER: 'subscriptionhandler',
+    END_POINT_SETTING_HANDLER: 'settinghandler',
+    END_POINT_THEME_HANDLER: 'themehandler',
+    END_POINT_LANGUAGE_HANDLER: 'languagehandler',
+    END_POINT_NOTIFICATION_HANDLER: 'notificationhandler',
+    END_POINT_SUGGESTED_SERVICES_HANDLER: 'suggestedservicehandler',
+
 };
 
 export default API_ENDPOINTS;
