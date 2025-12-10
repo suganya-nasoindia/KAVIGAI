@@ -17,9 +17,9 @@ import store from './src/redux/reactstore';
 import SplashScreen from './src/screens/Splash/SplashScreen';
 import WelcomeCarouselScreen from './src/screens/WelcomeCarousel/WelcomeCarouselScreen';
 import LoginScreen from './src/modules/Login/LoginScreen';
-import StartJourneyScreen from './src/screens/StartJourneyScreen';
 import { Provider as PaperProvider } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import SuggestedServicesView from './src/modules/SuggestedServices/SuggestedServicesView';
 
 
 export type RootStackParamList = {
@@ -70,7 +70,7 @@ export default function App() {
             {/* Start Your Journey page */}
             <Stack.Screen 
               name="StartJourney" 
-              component={StartJourneyScreen} 
+              component={SuggestedServicesView} 
               options={{ headerShown: false }} 
             />
           </Stack.Navigator>

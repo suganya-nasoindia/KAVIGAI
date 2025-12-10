@@ -6,7 +6,7 @@ import {
 } from "react-native";
 import { TextInput, Provider as PaperProvider } from "react-native-paper";
 import { useLoginController } from "./LoginController";
-import Constants from "../../Constants";
+import Constants from "../../Components/Constants";
 
 const { width, height } = Dimensions.get('window');
 
