@@ -54,7 +54,7 @@ export const useLoginController = (navigation: any) => {
       // Navigate
       if (firstTime === true) {
         console.log("➡ Navigating to StartYourJourney");
-        navigation.replace("StartJourney");
+        navigation.replace("WelcomeScreen");
       } else {
         console.log("➡ Navigating to Dashboard");
         navigation.replace("Dashboard");

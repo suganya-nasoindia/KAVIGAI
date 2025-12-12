@@ -1,0 +1,20 @@
+{
+  "welcomeMessage": "Congratulations on your new KAVIGAI account. We are excited to have you on board. KAVIGAI is a platform where you can: Set your goals and achieve it. Find mentors and get guidance from them. Be a mentor and motivate your mentees. Get great Connections. Establish a beautiful mentor-mentee relationship.",
+  "onboardMessage": "Get the help you need at anytime from anywhere.",
+  "goalsMessage": "Set your goals and achieve it. Find mentors and get guidance from them.",
+  "mentorMessage": "Establish a beautiful mentor-mentee relationship. Get the help you need at anytime from anywhere.",
+  "taglineMessage": "Explore... Discover... Succeed!!",
+  "allTheBestMessage": "All the Best!!",
+  "teamMessage": "Team KAVIGAI",
+  "continueBtn": "Start Your Journey",
+  "alertTitle": "KAVIGAI - Manage Account",
+  "ForgotPasswordMessage": "You will receive an OTP through email. Enter that OTP to reset the password.",
+  "resetMessage": "Password reset successfully. Please login with your new password.",
+  "todo": "TODO",
+  "event": "EVENT",
+  "book": "BOOK",
+  "meeting": "MEETING",
+  "website": "WEBSITE",
+  "goal": "GOAL",
+  "menteeRequest": "Need Help in Achieving Goal"
+}
