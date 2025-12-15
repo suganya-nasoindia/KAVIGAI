@@ -80,7 +80,7 @@ export default function App() {
                   name="StartJourney"
                   component={SuggestedServicesView}
                   options={({ navigation }) => ({
-                    title: "Suggested Services",
+                    title: "Start Your Journey",
                     headerRight: () => (
                       <TouchableOpacity
                         onPress={() => navigation.navigate("Home")}
