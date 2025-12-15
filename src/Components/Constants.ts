@@ -41,7 +41,6 @@ const Constants = {
     IP_ADDRESS: 'ipaddress',
     GPS_COORDINATES: 'gpsCoordinate',
 
-    AUTHORIZATION: 'Authorization',
     DATA: 'data',
     PREF_KEY_SELECTED_EVENT: 'selectedevent',
 
@@ -165,6 +164,10 @@ const Constants = {
     PRIVACY_POLICY_URL: 'https://app.kavigai.com/assets/privacy_policy.html',
     TOS_URL: 'https://app.kavigai.com/assets/terms_of_service.html',
     HELP_URL: 'https://app.kavigai.com/assets/help.html',
+
+     X_AUTH_TOKEN :"X-Auth-Token",
+     AUTHORIZATION:"Authorization"
+
 } as const;
 
 export type ConstantsKeys = keyof typeof Constants;

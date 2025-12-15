@@ -1,5 +1,3 @@
-// src/modules/suggestedServices/SuggestedServicesView.tsx
-
 import React from "react";
 import {
   View,
@@ -9,8 +7,9 @@ import {
   Image,
   Dimensions,
   ImageBackground,
+  FlatList,
 } from "react-native";
-import { RecyclerListView, LayoutProvider } from "recyclerlistview";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSuggestedServicesController } from "./SuggestedServicesController";
 
 const { width, height } = Dimensions.get("window");
@@ -34,15 +33,9 @@ const images = {
 const SuggestedServicesView = () => {
   const { dataProvider, loading, error } = useSuggestedServicesController();
 
-  const layoutProvider = new LayoutProvider(
-    () => 0,
-    (_, dim) => {
-      dim.width = width;
-      dim.height = 110;
-    }
-  );
+  const data = dataProvider.getAllData?.() || [];
 
-  const rowRenderer = (_, item, index) => {
+  const renderItem = ({ item, index }: any) => {
     let imageSource;
 
     switch (item.type) {
@@ -67,7 +60,7 @@ const SuggestedServicesView = () => {
     return (
       <ImageBackground source={bg} style={styles.card}>
         <View style={styles.row}>
-          <Image source={imageSource} style={styles.image} resizeMode="contain" />
+          <Image source={imageSource} style={styles.image} />
           <View style={styles.textContainer}>
             <Text style={styles.titleText}>{item.name}</Text>
             <Text style={styles.descText}>{item.description}</Text>
@@ -79,10 +72,10 @@ const SuggestedServicesView = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
         <Text>Loading...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -101,15 +94,13 @@ const SuggestedServicesView = () => {
         style={styles.headerImage}
       />
 
-      {dataProvider.getSize() > 0 ? (
-        <RecyclerListView
-          layoutProvider={layoutProvider}
-          dataProvider={dataProvider}
-          rowRenderer={rowRenderer}
-        />
-      ) : (
-        <Text style={styles.emptyText}>No services available</Text>
-      )}
+      <FlatList
+        data={data}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={{ paddingVertical: 4 }} // 👈 tight spacing
+        showsVerticalScrollIndicator={false}
+      />
 
       <Image
         source={require("../../assets/kavigai_text_only_rectangle.png")}
@@ -120,7 +111,6 @@ const SuggestedServicesView = () => {
 };
 
 export default SuggestedServicesView;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -138,20 +128,20 @@ const styles = StyleSheet.create({
   },
   card: {
     width: width * 0.98,
-    padding: 20,
-    marginLeft: 5,
-    marginRight: 5,
-    marginBottom: 15,
-    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginHorizontal: 5,
+    marginBottom: 4,      // ✅ 2–5dp spacing
+    borderRadius: 16,
     overflow: "hidden",
   },
   row: {
     flexDirection: "row",
-    paddingHorizontal: 10,
+    alignItems: "flex-start",
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 48,
+    height: 48,
     marginRight: 10,
     tintColor: "white",
   },
@@ -162,9 +152,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#498ABF",
+    marginBottom: 2,
   },
   descText: {
     fontSize: 14,
     color: "#FFFFFF",
+    lineHeight: 18,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
   },
 });

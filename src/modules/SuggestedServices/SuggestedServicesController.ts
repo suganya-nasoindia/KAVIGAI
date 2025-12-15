@@ -1,10 +1,10 @@
-// src/modules/suggestedServices/SuggestedServicesController.ts
-
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DataProvider } from "recyclerlistview";
 import { SuggestedServicesService } from "./SuggestedService";
+import { SuggestedServiceItem } from "./SuggestedServicesTypes";
 
 export const useSuggestedServicesController = () => {
   const [dataProvider, setDataProvider] = useState(
@@ -13,9 +13,7 @@ export const useSuggestedServicesController = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { apiKey, accessToken, loginName } = useSelector(
-    (state: any) => state.auth
-  );
+  const reduxAuth = useSelector((state: any) => state.auth);
 
   useEffect(() => {
     loadServices();
@@ -25,28 +23,41 @@ export const useSuggestedServicesController = () => {
     try {
       setLoading(true);
 
-      const response = await SuggestedServicesService.fetchServices(
-        apiKey,
-        accessToken,
-        loginName
-      );
+      const [storedApiKey, storedAuthToken, storedLoginName] =
+        await AsyncStorage.multiGet([
+          "API_KEY",
+          "AUTH_TOKEN",
+          "LOGIN_NAME",
+        ]).then(values => values.map(v => v[1]));
 
-      if (response?.status?.statusCode === 200) {
-        const content = response?.data?.content;
+      const apiKey = storedApiKey || reduxAuth?.apiKey;
+      const authToken = storedAuthToken || reduxAuth?.accessToken;
+      const loginName = storedLoginName || reduxAuth?.loginName;
 
-        if (Array.isArray(content)) {
-          setDataProvider((prev) => prev.cloneWithRows(content));
-        } else {
-          Alert.alert("Error", "Unexpected data format");
-        }
+      if (!apiKey || !authToken || !loginName) {
+        throw new Error("Missing authentication credentials");
+      }
+
+      const response = await SuggestedServicesService.fetchServices(apiKey, authToken, loginName);
+
+      if (
+        response.success &&
+        response.data?.status?.statusCode === 200
+      ) {
+        const content = response.data.data
+          .content as SuggestedServiceItem[];
+
+        setDataProvider(prev => prev.cloneWithRows(content));
       } else {
-        const msg =
-          response?.data?.content?.message ||
-          "Unable to fetch services. Please try again.";
-        Alert.alert("Error", msg);
+        Alert.alert(
+          "Error",
+          response.data?.status?.message ||
+            response.error ||
+            "Unable to fetch services"
+        );
       }
     } catch (err: any) {
-      console.log("❌ Controller Error:", err);
+      console.log("❌ SuggestedServices Controller Error:", err);
       setError(err?.message || "Something went wrong");
     } finally {
       setLoading(false);

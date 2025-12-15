@@ -5,7 +5,7 @@
  * @format
  */
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar,TouchableOpacity,Image,StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -79,8 +79,17 @@ export default function App() {
                 <Stack.Screen
                   name="StartJourney"
                   component={SuggestedServicesView}
-                  options={{ headerShown: false }}
-                />
+                  options={({ navigation }) => ({
+                    title: "Suggested Services",
+                    headerRight: () => (
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate("Home")}
+                        style={{ marginLeft: 15 }}
+                      >
+                        <Image source={require('./src/assets/home.png')} style={styles.icon}/>
+                      </TouchableOpacity>
+                    ),
+                  })}                />
               </Stack.Navigator>
             </NavigationContainer>
           </PaperProvider>
@@ -94,4 +103,10 @@ const headerStyles = {
   headerStyle: { backgroundColor: '#4682B4' },
   headerTitleStyle: { color: '#fff' },
   headerTintColor: '#fff',
+
 };
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  iconButton: { marginRight: 15 },
+  icon: { width: 25, height: 25, tintColor: '#fff' },
+});

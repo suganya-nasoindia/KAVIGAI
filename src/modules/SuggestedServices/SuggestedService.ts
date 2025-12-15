@@ -2,15 +2,14 @@
 
 import { POSTMethod } from "../../services/api/ApiClient";
 import API_ENDPOINTS  from "../../services/api/endpoints";
-
+import { SuggestedServiceResponse } from "./SuggestedServicesTypes";
 import Utilities from "../../Components/Utilities";
 
 export const SuggestedServicesService = {
   async fetchServices(apiKey: string, accessToken: string, loginName: string) {
     try {
       const headers = {
-        "X-Access-Token": accessToken,
-        "X-Api-Key": apiKey,
+        "X-Auth-Token": accessToken,
         Authorization: apiKey,
       };
 
@@ -38,7 +37,7 @@ export const SuggestedServicesService = {
 
       console.log("📤 Fetching Suggested Services:", requestBody);
 
-      const response = await POSTMethod(
+      const response = await POSTMethod<SuggestedServiceResponse>(
         API_ENDPOINTS.END_POINT_SUGGESTED_SERVICES_HANDLER,
         requestBody,
         headers

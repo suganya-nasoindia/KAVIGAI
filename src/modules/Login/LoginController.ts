@@ -42,13 +42,14 @@ export const useLoginController = (navigation: any) => {
         return;
       }
 
-      const { apiKey, authToken, firstTime } = content;
+      const { apiKey, authToken, firstTime,loginName } = content;
 
-      console.log("Extracted Values:", { apiKey, authToken, firstTime });
+      console.log("Extracted Values:", { apiKey, authToken, firstTime,loginName });
 
       // Save values
       await AsyncStorage.setItem("API_KEY", apiKey);
       await AsyncStorage.setItem("AUTH_TOKEN", authToken);
+      await AsyncStorage.setItem("LOGIN_NAME", loginName);
       await AsyncStorage.setItem("FIRST_TIME", JSON.stringify(firstTime));
 
       // Navigate
