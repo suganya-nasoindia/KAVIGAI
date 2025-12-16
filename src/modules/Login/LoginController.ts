@@ -4,13 +4,20 @@ import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginService } from "./LoginServices";
 import { LoginResponse } from "./LoginTypes";
+import { UserInfoService } from "../UserInfo/UserInfoService";
+import { setUserInfo } from "../../redux/actions";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/reactstore";
+
 
 export const useLoginController = (navigation: any) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleLogin = async () => {
+
     try {
       setLoading(true);
 
@@ -29,11 +36,7 @@ export const useLoginController = (navigation: any) => {
 
         Alert.alert("Login Failed", errorMessage);
         return;
-      }
-
-     
-     
-     
+      }   
       const content = response?.data?.content;
 
       if (!content) {
@@ -51,6 +54,15 @@ export const useLoginController = (navigation: any) => {
       await AsyncStorage.setItem("AUTH_TOKEN", authToken);
       await AsyncStorage.setItem("LOGIN_NAME", loginName);
       await AsyncStorage.setItem("FIRST_TIME", JSON.stringify(firstTime));
+
+      const userInfoResponse = await UserInfoService.fetchUserInfo();
+
+      if (
+        userInfoResponse.success &&
+        userInfoResponse.data?.status?.statusCode === 200
+      ) {
+        dispatch(setUserInfo(userInfoResponse.data.data.content));
+      }
 
       // Navigate
       if (firstTime === true) {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -8,18 +8,16 @@ import {
   Dimensions,
   ImageBackground,
   FlatList,
+  Pressable,Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSuggestedServicesController } from "./SuggestedServicesController";
+import { useNavigation } from "@react-navigation/native";
 
 const { width, height } = Dimensions.get("window");
+import Constants  from "../../Components/Constants";
 
-const Constants = {
-  PROFILEUPDATE: "PROFILEUPDATE",
-  TAKEATOUR: "TAKEATOUR",
-  FINDMENTOR: "FINDMENTOR",
-  SETAGOAL: "SETAGOAL",
-};
+
 
 const images = {
   user: require("../../assets/user.png"),
@@ -32,11 +30,41 @@ const images = {
 
 const SuggestedServicesView = () => {
   const { dataProvider, loading, error } = useSuggestedServicesController();
+  const navigation = useNavigation<any>();
 
   const data = dataProvider.getAllData?.() || [];
 
+  const isNavigating = useRef(false);
+
+  const onCardPress = (item: any) => {
+    if (isNavigating.current) return;
+
+    isNavigating.current = true;
+
+    switch (item.type) {
+      case Constants.PROFILEUPDATE:
+        navigation.navigate("ProfileUpdate");
+        break;
+      case Constants.FINDMENTOR:
+        navigation.navigate("FindMentor");
+        break;
+      case Constants.SETAGOAL:
+        navigation.navigate("SetGoal");
+        break;
+      case Constants.TAKEATOUR:
+        Linking.openURL(Constants.TAKE_A_TOUR_URL);
+        break;
+      default:
+        console.warn("Unknown service type:", item.type);
+    }
+
+    setTimeout(() => {
+      isNavigating.current = false;
+    }, 400);
+  };
+
   const renderItem = ({ item, index }: any) => {
-    let imageSource;
+    let imageSource = images.user;
 
     switch (item.type) {
       case Constants.PROFILEUPDATE:
@@ -51,22 +79,25 @@ const SuggestedServicesView = () => {
       case Constants.SETAGOAL:
         imageSource = images.goal;
         break;
-      default:
-        imageSource = images.user;
     }
 
     const bg = index % 2 === 0 ? images.startJourney1 : images.startJourney2;
 
     return (
-      <ImageBackground source={bg} style={styles.card}>
-        <View style={styles.row}>
-          <Image source={imageSource} style={styles.image} />
-          <View style={styles.textContainer}>
-            <Text style={styles.titleText}>{item.name}</Text>
-            <Text style={styles.descText}>{item.description}</Text>
+      <Pressable
+        onPress={() => onCardPress(item)}
+        android_ripple={{ color: "rgba(255,255,255,0.2)" }}
+      >
+        <ImageBackground source={bg} style={styles.card}>
+          <View style={styles.row}>
+            <Image source={imageSource} style={styles.image} />
+            <View style={styles.textContainer}>
+              <Text style={styles.titleText}>{item.name}</Text>
+              <Text style={styles.descText}>{item.description}</Text>
+            </View>
           </View>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
+      </Pressable>
     );
   };
 
@@ -98,7 +129,7 @@ const SuggestedServicesView = () => {
         data={data}
         keyExtractor={(_, index) => index.toString()}
         renderItem={renderItem}
-        contentContainerStyle={{ paddingVertical: 4 }} // 👈 tight spacing
+        contentContainerStyle={{ paddingVertical: 4 }}
         showsVerticalScrollIndicator={false}
       />
 

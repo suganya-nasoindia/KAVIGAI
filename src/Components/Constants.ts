@@ -156,6 +156,14 @@ const Constants = {
 
     END_POINT_VERSION_HANDLER: 'versionchecker',
 
+  
+        PROFILEUPDATE: "PROFILEUPDATE",
+        TAKEATOUR: "TAKEATOUR",
+        FINDMENTOR: "FINDMENTOR",
+        SETAGOAL: "SETAGOAL",
+   
+      
+
     APP_UPDATE_URL:
         'https://play.google.com/store/apps/details?id:com.nasotech.kavigai&ah:-YwxNJW7G6TMVi8o4xwmo-DJfsE',
 
@@ -164,7 +172,7 @@ const Constants = {
     PRIVACY_POLICY_URL: 'https://app.kavigai.com/assets/privacy_policy.html',
     TOS_URL: 'https://app.kavigai.com/assets/terms_of_service.html',
     HELP_URL: 'https://app.kavigai.com/assets/help.html',
-
+    TAKE_A_TOUR_URL: "https://kavigai.com/home/",
      X_AUTH_TOKEN :"X-Auth-Token",
      AUTHORIZATION:"Authorization"
 
