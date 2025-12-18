@@ -17,63 +17,125 @@ export const useLoginController = (navigation: any) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogin = async () => {
+    setLoading(true);
 
     try {
-      setLoading(true);
+      /* ======================
+         1️⃣ LOGIN API
+      ====================== */
+      const response: LoginResponse =
+        await LoginService.login(username, password);
+      console.log("rESPONSE Code:", response);
+      console.log("success:", response.success);
+      console.log("status:", response.status);
+      console.log("statusCode:", response.status?.statusCode);
 
-      const response: LoginResponse = await LoginService.login(username, password);
-
-      console.log("=== FULL LOGIN RESPONSE ===");
-      console.log(JSON.stringify(response, null, 2));
-     
-      const statusCode = response?.status?.statusCode;
-
-      // ❌ If API returns 401 or FAILURE → Show Error
+      const statusCode =
+        response?.status?.statusCode;
+      console.log("Status Code:", statusCode);
       if (statusCode !== 200) {
-        const errorMessage =
+        Alert.alert(
+          "Login Failed",
           response?.data?.content?.message ||
-          "Login failed. Please check your username/password.";
-
-        Alert.alert("Login Failed", errorMessage);
-        return;
-      }   
-      const content = response?.data?.content;
-
-      if (!content) {
-        Alert.alert("Error", "Invalid server response.");
-        console.log("❌ ERROR: Content missing in login response");
-        return;
+          "Invalid username or password"
+        );
+        return; // ⛔ STOP
       }
 
-      const { apiKey, authToken, firstTime,loginName } = content;
+      const content = response?.data?.content;
+      if (!content) {
+        Alert.alert("Error", "Invalid login response");
+        return; // ⛔ STOP
+      }
 
-      console.log("Extracted Values:", { apiKey, authToken, firstTime,loginName });
+      const {
+        apiKey,
+        authToken,
+        firstTime,
+        loginName,
+      } = content;
 
-      // Save values
-      await AsyncStorage.setItem("API_KEY", apiKey);
-      await AsyncStorage.setItem("AUTH_TOKEN", authToken);
-      await AsyncStorage.setItem("LOGIN_NAME", loginName);
-      await AsyncStorage.setItem("FIRST_TIME", JSON.stringify(firstTime));
+      /* ======================
+         2️⃣ SAVE TOKENS
+      ====================== */
+      await AsyncStorage.multiSet([
+        ["API_KEY", apiKey],
+        ["AUTH_TOKEN", authToken],
+        ["LOGIN_NAME", loginName],
+        ["FIRST_TIME", JSON.stringify(firstTime)],
+      ]);
 
-      const userInfoResponse = await UserInfoService.fetchUserInfo();
+      /* ======================
+         3️⃣ USER INFO API
+      ====================== */
+      const userInfoResponse =
+        await UserInfoService.fetchUserInfo();
+
+      console.log("USER INFO RESPONSE:", userInfoResponse);
+
+      const userStatusCode  = userInfoResponse?.data?.status?.statusCode;
+
+      console.log("Status Code:", userStatusCode);
 
       if (
-        userInfoResponse.success &&
-        userInfoResponse.data?.status?.statusCode === 200
+        !userInfoResponse?.success ||
+        userStatusCode !== 200
       ) {
-        dispatch(setUserInfo(userInfoResponse.data.data.content));
+        Alert.alert(
+          "Error",
+          "Failed to load user profile"
+        );
+
+        await AsyncStorage.multiRemove([
+          "API_KEY",
+          "AUTH_TOKEN",
+        ]);
+
+        return; // ⛔ STOP
       }
 
-      // Navigate
-      if (firstTime === true) {
-        console.log("➡ Navigating to StartYourJourney");
-        navigation.replace("WelcomeScreen");
-      } else {
-        console.log("➡ Navigating to Dashboard");
-        navigation.replace("Dashboard");
-      }
+      const userPayload =
+      userInfoResponse?.data?.data?.content?.[0];
+    
+      console.log("User ID:", userPayload?.user?.userID);
+
+
+      dispatch(setUserInfo(userPayload));
+
+      // /* ======================
+      //    4️⃣ SERVICES API
+      // ====================== */
+      // const servicesResponse =
+      //   await AppServices.fetchServices();
+
+      // if (
+      //   !servicesResponse.success ||
+      //   servicesResponse.data?.status?.statusCode !== 200
+      // ) {
+      //   Alert.alert(
+      //     "Error",
+      //     "Failed to load services"
+      //   );
+      //   await AsyncStorage.multiRemove([
+      //     "API_KEY",
+      //     "AUTH_TOKEN",
+      //   ]);
+      //   return; // ⛔ STOP
+      // }
+
+      /* ======================
+         5️⃣ NAVIGATION (ONLY NOW)
+      ====================== */
+      navigation.replace(
+        firstTime ? "WelcomeScreen" : "Dashboard"
+      );
+
     } catch (err) {
       console.log("LOGIN ERROR:", err);
+      Alert.alert(
+        "Error",
+        "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }

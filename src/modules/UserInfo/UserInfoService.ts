@@ -1,8 +1,11 @@
 import { POSTMethod } from "../../services/api/ApiClient";
 import API_ENDPOINTS from "../../services/api/endpoints";
+import { UserInfoApiResponse } from "./UserInfoTypes";
 
 export const UserInfoService = {
-  async fetchUserInfo() {
+  async fetchUserInfo(): Promise<UserInfoApiResponse> {
+    try{
+       
     const body = {
       data: JSON.stringify({
         info: {
@@ -28,6 +31,10 @@ export const UserInfoService = {
     );
 
     console.log("📥 UserInfo Response:", response);
-    return response;
+    return response;}
+    catch(err){
+        console.log("❌ UserInfo Error:", err);
+        throw err;
+    }
   },
 };

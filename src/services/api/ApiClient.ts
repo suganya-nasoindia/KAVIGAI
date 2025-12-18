@@ -3,7 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface ApiResponse<T = any> {
   success: boolean;
-  data?: T;
+  statusCode: number;
+  data?: T ;
   error?: string;
 }
 
@@ -17,12 +18,12 @@ const BASE_URL = "https://api.kavigai.com/api/v1/index.php/";
  *  GET TOKEN & APIKEY FROM STORAGE
 -------------------------------------*/
 const getAuthHeaders = async () => {
-  const token = await AsyncStorage.getItem("authToken");
-  const apiKey = await AsyncStorage.getItem("apiKey");
+  const token = await AsyncStorage.getItem("AUTH_TOKEN");
+  const apiKey = await AsyncStorage.getItem("API_KEY");
 
   return {
-    Authorization: token ? `Bearer ${token}` : "",
-    "x-api-key": apiKey ?? "",
+    Authorization: apiKey ? `Bearer ${token}` : "",
+    "X-Auth-Token": token ?? "",
   };
 };
 
@@ -31,7 +32,7 @@ const getAuthHeaders = async () => {
 -------------------------------------*/
 export const POSTMethod = async <T>(
   endpoint: string,
-  body: unknown,
+  body: any,
   customHeaders: HeadersType = {}
 ): Promise<ApiResponse<T>> => {
   try {
@@ -45,12 +46,10 @@ export const POSTMethod = async <T>(
 
     const url = `${BASE_URL}${endpoint}`;
 
-    // 🔵 Log Outgoing Request
     console.log("====== POST REQUEST ======");
     console.log("URL:", url);
     console.log("Headers:", headers);
     console.log("Body:", body);
-
 
     const response = await fetch(url, {
       method: "POST",
@@ -58,46 +57,37 @@ export const POSTMethod = async <T>(
       body: JSON.stringify(body),
     });
 
-    // Handle invalid / no JSON or empty response
     const text = await response.text();
-
-    // 🔵 Log Raw Response
     console.log("====== RAW RESPONSE TEXT ======");
     console.log(text);
 
     const json = text ? JSON.parse(text) : {};
 
-    // 🔵 Log Parsed JSON
     console.log("====== PARSED RESPONSE JSON ======");
     console.log(json);
 
+    // ❌ HTTP ERROR
     if (!response.ok) {
-      const errorResponse = {
+      return {
         success: false,
+        statusCode: response.status,
         error: json?.message || json?.error || "Request failed",
       };
-
-      console.log("====== FINAL ERROR RESPONSE ======");
-      console.log(errorResponse);
-
-      return errorResponse;
     }
-    const successResponse = {
+
+    // ✅ HTTP SUCCESS
+    return {
       success: true,
-      data: json,
+      statusCode: response.status,
+      data: json as T,
     };
-
-    console.log("====== FINAL SUCCESS RESPONSE ======");
-    console.log(successResponse);
-
-    return successResponse;
   } catch (error: any) {
-    console.log("====== FETCH ERROR ======");
-    console.log(error);
-
     return {
       success: false,
+      statusCode: 0,
       error: error.message || "Network error",
     };
   }
 };
+
+
