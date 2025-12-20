@@ -5,7 +5,7 @@
  * @format
  */
 import React from 'react';
-import { StatusBar,TouchableOpacity,Image,StyleSheet } from 'react-native';
+import { StatusBar, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -23,6 +23,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SuggestedServicesView from './src/modules/SuggestedServices/SuggestedServicesView';
 import WelcomeScreen from './src/screens/WelcomeScreen/WelcomeScreen';
 
+import Profile from './src/modules/Profile';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -75,6 +76,10 @@ export default function App() {
                   options={{ headerShown: false }}
                 />
 
+                <Stack.Screen
+                  name="ProfileUpdate"
+                  component={Profile}
+                />
                 {/* Start Your Journey page */}
                 <Stack.Screen
                   name="StartJourney"
@@ -86,10 +91,10 @@ export default function App() {
                         onPress={() => navigation.navigate("Home")}
                         style={{ marginLeft: 15 }}
                       >
-                        <Image source={require('./src/assets/home.png')} style={styles.icon}/>
+                        <Image source={require('./src/assets/home.png')} style={styles.icon} />
                       </TouchableOpacity>
                     ),
-                  })}                />
+                  })} />
               </Stack.Navigator>
             </NavigationContainer>
           </PaperProvider>

@@ -73,7 +73,7 @@ export const useLoginController = (navigation: any) => {
 
       console.log("USER INFO RESPONSE:", userInfoResponse);
 
-      const userStatusCode  = userInfoResponse?.data?.status?.statusCode;
+      const userStatusCode = userInfoResponse?.data?.status?.statusCode;
 
       console.log("Status Code:", userStatusCode);
 
@@ -95,13 +95,17 @@ export const useLoginController = (navigation: any) => {
       }
 
       const userPayload =
-      userInfoResponse?.data?.data?.content?.[0];
-    
-      console.log("User ID:", userPayload?.user?.userID);
+        userInfoResponse?.data?.data?.content?.[0].user;
 
-
+      //console.log("User ID:", userPayload?.user?.userID);
+      const userId = userPayload?.user?.userID;
       dispatch(setUserInfo(userPayload));
 
+      if (userId) {
+        await AsyncStorage.setItem("USER_ID", String(userId));
+      }
+      const storedUserId = await AsyncStorage.getItem("USER_ID");
+console.log("Stored User ID:", storedUserId);
       // /* ======================
       //    4️⃣ SERVICES API
       // ====================== */
