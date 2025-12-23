@@ -95,7 +95,7 @@ export const useLoginController = (navigation: any) => {
       }
 
       const userPayload =
-        userInfoResponse?.data?.data?.content?.[0].user;
+        userInfoResponse?.data?.data?.content?.[0]?.user;
 
       //console.log("User ID:", userPayload?.user?.userID);
       const userId = userPayload?.user?.userID;

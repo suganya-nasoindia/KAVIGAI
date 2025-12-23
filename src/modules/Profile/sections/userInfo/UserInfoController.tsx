@@ -1,84 +1,87 @@
-// UserInfoController.tsx
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from "../../../../redux/reactstore";
 import {
+  setProfile,
   updateProfileField,
-} from '../../../../redux/slices/userProfileSlice';
+} from "../../../../redux/slices/userProfileSlice";
+import { UserInfoService } from "../../../UserInfo/UserInfoService";
 
-// import {
-//   loadUserProfileFromStorage,
-//   saveUserProfileToStorage,
-//   updateUserProfile,
-// } from '../../../controllers/UserProfileController';
+/* ---------------- LOAD USER PROFILE ---------------- */
+export const loadUserProfile = () => async (dispatch: AppDispatch) => {
+  try {
+    const response = await UserInfoService.fetchUserInfo();
+    console.log("📥 Fetched user profile:", response?.data);
 
-import UserInfoView from './UserInfoView';
-
-const UserInfoController = () => {
-  const dispatch = useDispatch();
-  const profile = useSelector((state: any) => state.userProfile);
-  // const { apiKey, accessToken, loginName } = useSelector(
-  //   (state: any) => state.auth
-  // );
-
-  const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState({
-    personal: false,
-    address: false,
-    education: false,
-    social: false,
-    extras: false,
-    about: false,
-  });
-
-  useEffect(() => {
-    const loadData = async () => {
-      // const storedProfile = await loadUserProfileFromStorage();
-      // dispatch(setProfile(storedProfile));
-    };
-    loadData();
-  }, [dispatch]);
-
-  const toggle = (key: string) => {
-    setExpanded(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleChange = (field: string, value: string) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      dispatch(
-        updateProfileField({
-          field: parent,
-          value: { ...profile[parent], [child]: value },
-        })
-      );
-    } else {
-      dispatch(updateProfileField({ field, value }));
+    const profileFromApi =
+      response?.data?.data?.content?.[0]?.user;
+    console.log("📥 profileFromApi:", profileFromApi);
+    if (!profileFromApi) {
+      console.warn("⚠️ Profile missing in API response");
+      return;
     }
-  };
 
-  const handleUpdate = async () => {
-    setLoading(true);
-    try {
-      // await updateUserProfile({ apiKey, accessToken, loginName, profile });
-      // await saveUserProfileToStorage({ profile });
-      // alert('Profile updated!');
-    } catch (e) {
-      // alert('Update failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <UserInfoView
-      profile={profile}
-      expanded={expanded}
-      loading={loading}
-      onToggle={toggle}
-      onChange={handleChange}
-      onUpdate={handleUpdate}
-    />
-  );
+    dispatch(setProfile(mapApiProfileToStore(profileFromApi)));
+  } catch (error) {
+    console.error("❌ loadUserProfile failed", error);
+  }
 };
 
-export default UserInfoController;
+/* ---------------- UPDATE FIELD (SIMPLE & SAFE) ---------------- */
+export const updateUserProfileField =
+  ({ field, value }: { field: string; value: string }) =>
+    (dispatch: AppDispatch) => {
+      dispatch(updateProfileField({ field, value }));
+    };
+
+/* ---------------- SUBMIT PROFILE UPDATE ---------------- */
+export const submitUserProfileUpdate =
+  () => async (_dispatch: AppDispatch, getState: () => RootState) => {
+    const profile = getState().userProfile;
+
+    console.log("📤 Submitting profile:", profile);
+
+    // 🔜 Uncomment when API is ready
+    // await UserInfoService.updateUserInfo({
+    //   content: profile,
+    // });
+  };
+
+/* ---------------- API → STORE MAPPER ---------------- */
+const mapApiProfileToStore = (apiProfile: any) => ({
+  userID: apiProfile.userID ?? null,
+  loginName: apiProfile.loginName ?? "",
+
+  firstName: apiProfile.firstName ?? "",
+  lastName: apiProfile.lastName ?? "",
+  mobile: apiProfile.mobile ?? "",
+  email: apiProfile.email ?? "",
+  gender: apiProfile.gender ?? "",
+  location: apiProfile.location ?? "",
+
+  address: {
+    street1: apiProfile.address?.street1 ?? "",
+    street2: apiProfile.address?.street2 ?? "",
+    city: apiProfile.address?.city ?? "",
+    state: apiProfile.address?.state ?? "",
+    country: apiProfile.address?.country ?? "",
+    zipcode: apiProfile.address?.zipcode ?? "",
+  },
+
+  education: apiProfile.education ?? "",
+  academy: apiProfile.academy ?? "",
+  profession: apiProfile.profession ?? "",
+  experience: apiProfile.experience ?? "",
+  company: apiProfile.company ?? "",
+  nonProfit: apiProfile.nonProfit ?? "",
+
+  linkedin: apiProfile.linkedin ?? "",
+  facebook: apiProfile.facebook ?? "",
+  twitter: apiProfile.twitter ?? "",
+  youtube: apiProfile.youtube ?? "",
+  instagram: apiProfile.instagram ?? "",
+
+  language: apiProfile.language ?? "",
+  hobbies: apiProfile.hobbies ?? "",
+  interests: apiProfile.interests ?? "",
+  awards: apiProfile.awards ?? "",
+  about: apiProfile.about ?? "",
+});
