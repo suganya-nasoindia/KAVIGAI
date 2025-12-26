@@ -1,6 +1,6 @@
 /* ======================================
    USER INFO API – SINGLE TYPE DEFINITION
-====================================== */
+   ====================================== */
 
 export interface UserInfoApiResponse {
     status: {

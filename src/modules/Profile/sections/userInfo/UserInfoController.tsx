@@ -10,7 +10,6 @@ export const loadUserProfile = () => async (dispatch: AppDispatch) => {
   try {
     const response = await UserInfoService.fetchUserInfo();
     console.log("📥 Fetched user profile:", response?.data);
-
     const profileFromApi =
       response?.data?.data?.content?.[0]?.user;
     console.log("📥 profileFromApi:", profileFromApi);
@@ -34,15 +33,89 @@ export const updateUserProfileField =
 
 /* ---------------- SUBMIT PROFILE UPDATE ---------------- */
 export const submitUserProfileUpdate =
-  () => async (_dispatch: AppDispatch, getState: () => RootState) => {
-    const profile = getState().userProfile;
+  () => async (dispatch: AppDispatch, getState: () => RootState) => {
+    try {
+      console.log("🟡 submitUserProfileUpdate started");
 
-    console.log("📤 Submitting profile:", profile);
+      const profile = getState().userProfile;
+      console.log("🟡 Profile:", profile);
 
-    // 🔜 Uncomment when API is ready
-    // await UserInfoService.updateUserInfo({
-    //   content: profile,
-    // });
+      if (!profile?.userID) {
+        console.warn("⚠️ userID missing");
+        return;
+      }
+      console.log("📤 Submitting profile:", profile);
+
+      const payload = {
+        info: {
+          type: 'mobile',
+          actionType: 'update',
+          platformType: 'mobile',
+          outputType: 'json',
+        },
+        data: {
+          content: {
+            userID: profile.userID,
+
+            loginName: profile.loginName,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            email: profile.email,
+            mobile: profile.mobile,
+            gender: profile.gender,
+            photo: profile.photo, // ✅ FIX
+
+            education: profile.education,
+            academicInstitutions: profile.academy,
+            profession: profile.profession,
+            experience: profile.experience,
+            companyInformation: profile.company,
+            nonProfit: profile.nonProfit,
+
+            interests: profile.interests,
+            hobbies: profile.hobbies,
+            languages: profile.language,
+
+            linkedin: profile.linkedin,
+            twitter: profile.twitter,
+            facebook: profile.facebook,
+            instagram: profile.instagram,
+            youtube: profile.youtube,
+
+            awardsRecognitions: profile.awards,
+            about: profile.about, // ✅ FIX
+
+            location: profile.location,
+            address: {
+              addressID: profile.address?.addressID,
+              street1: profile.address?.street1,
+              street2: profile.address?.street2,
+              city: profile.address?.city,
+              state: profile.address?.state,
+              country: profile.address?.country,
+              zipcode: profile.address?.zipcode,
+            },
+
+            isPaid: profile.isPaid,
+            subscriptionPlanID: profile.subscriptionPlanID,
+            subscriptionType: profile.subscriptionType,
+            userOrderID: profile.userOrderID,
+            userPaymentID: profile.userPaymentID,
+          },
+        },
+      };
+      console.log("🟢 Payload ready");
+      console.log("🔍 updateUser fn:", UserInfoService.updateUser);
+      console.log("typeof updateUser:", typeof UserInfoService.updateUser);
+
+      await UserInfoService.updateUser(payload);
+      console.log("✅ updateUser API SUCCESS");
+
+      // 🔥 Backend doesn't return updated data → must refetch
+      await dispatch(loadUserProfile());
+    } catch (error) {
+      console.error("❌ submitUserProfileUpdate failed", error);
+    }
   };
 
 /* ---------------- API → STORE MAPPER ---------------- */
@@ -58,6 +131,7 @@ const mapApiProfileToStore = (apiProfile: any) => ({
   location: apiProfile.location ?? "",
 
   address: {
+    addressID: apiProfile.address?.addressID ?? null, // 🔥 FIX
     street1: apiProfile.address?.street1 ?? "",
     street2: apiProfile.address?.street2 ?? "",
     city: apiProfile.address?.city ?? "",
@@ -67,10 +141,10 @@ const mapApiProfileToStore = (apiProfile: any) => ({
   },
 
   education: apiProfile.education ?? "",
-  academy: apiProfile.academy ?? "",
+  academy: apiProfile.academicInstitutions ?? "", // 🔥 FIX
   profession: apiProfile.profession ?? "",
   experience: apiProfile.experience ?? "",
-  company: apiProfile.company ?? "",
+  company: apiProfile.companyInformation ?? "", // 🔥 FIX
   nonProfit: apiProfile.nonProfit ?? "",
 
   linkedin: apiProfile.linkedin ?? "",
@@ -79,9 +153,9 @@ const mapApiProfileToStore = (apiProfile: any) => ({
   youtube: apiProfile.youtube ?? "",
   instagram: apiProfile.instagram ?? "",
 
-  language: apiProfile.language ?? "",
+  language: apiProfile.languages ?? "",
   hobbies: apiProfile.hobbies ?? "",
   interests: apiProfile.interests ?? "",
-  awards: apiProfile.awards ?? "",
+  awards: apiProfile.awardsRecognitions ?? "", // 🔥 FIX
   about: apiProfile.about ?? "",
 });

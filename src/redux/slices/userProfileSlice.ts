@@ -1,9 +1,70 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type UserProfileState = typeof initialState;
+/* ---------------- TYPES ---------------- */
 
-const initialState = {
-  userID: null as number | null,
+type Address = {
+  street1: string;
+  street2: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: string | number;
+};
+
+type MentorInfo = {
+  mentorTitle: string;
+  mentorDescription: string;
+  mentoringField: string;
+  mentorTags: string[],
+  price: 'Free' | 'Paid';
+  amount: number;
+  ratings: number;
+  discount: number;
+  currencyType: string;
+  availability: string;
+};
+
+type UserProfileState = {
+  /* BASIC PROFILE (UNCHANGED) */
+  userID: number | null;
+  loginName: string;
+  firstName: string;
+  lastName: string;
+  mobile: string;
+  email: string;
+  gender: string;
+  location: string;
+  address: Address;
+  education: string;
+  academy: string;
+  photo:null|string;
+  profession: string;
+  experience: string;
+  company: string;
+  nonProfit: string;
+  linkedin: string;
+  facebook: string;
+  twitter: string;
+  youtube: string;
+  instagram: string;
+  language: string;
+  hobbies: string;
+  interests: string;
+  awardsRecognitions: string;
+  about: string;
+ 
+  /* NEW SEPARATED BLOCKS */
+  mentorInfo: MentorInfo;
+  services: any[];
+  currentGoals: any[];
+  myMentors: any[];
+  myMentees: any[];
+};
+
+/* ---------------- INITIAL STATE ---------------- */
+
+const initialState: UserProfileState = {
+  userID: null,
   loginName: '',
   firstName: '',
   lastName: '',
@@ -19,6 +80,7 @@ const initialState = {
     country: '',
     zipcode: '',
   },
+  photo: null,
   education: '',
   academy: '',
   profession: '',
@@ -33,14 +95,37 @@ const initialState = {
   language: '',
   hobbies: '',
   interests: '',
-  awards: '',
+  awardsRecognitions: '',
   about: '',
+
+  /* NEW */
+  mentorInfo: {
+    mentorTitle: '',
+    mentorDescription: '',
+    mentoringField: '',
+    mentorTags: [],
+    price: 'Free',
+    amount: 0,
+    ratings: 0,
+    discount: 0,
+    currencyType: 'INR',
+    availability: '',
+  },
+
+  services: [],
+  currentGoals: [],
+  myMentors: [],
+  myMentees: [],
 };
+
+/* ---------------- SLICE ---------------- */
 
 const userProfileSlice = createSlice({
   name: "userProfile",
   initialState,
   reducers: {
+
+    /* ---------------- PROFILE (UNCHANGED) ---------------- */
     setProfile: (_, action: PayloadAction<Partial<UserProfileState>>) => {
       return {
         ...initialState,
@@ -54,7 +139,7 @@ const userProfileSlice = createSlice({
 
     updateProfileField: (
       state,
-      action: PayloadAction<{ field: string; value: string }>
+      action: PayloadAction<{ field: string; value: any }>
     ) => {
       const { field, value } = action.payload;
 
@@ -65,8 +150,58 @@ const userProfileSlice = createSlice({
         (state as any)[field] = value;
       }
     },
+
+    /* ---------------- MENTOR INFO ---------------- */
+    setMentorInfo(state, action: PayloadAction<MentorInfo>) {
+      state.mentorInfo = action.payload;
+    },
+
+    updateMentorField(
+      state,
+      action: PayloadAction<{ field: keyof MentorInfo; value: any }>
+    ) {
+      state.mentorInfo[action.payload.field as keyof MentorInfo] = action.payload.value;
+    },
+
+    /* ---------------- SERVICES ---------------- */
+    setServices(state, action: PayloadAction<any[]>) {
+      state.services = action.payload;
+    },
+
+    /* ---------------- CURRENT GOALS ---------------- */
+    setCurrentGoals(state, action: PayloadAction<any[]>) {
+      state.currentGoals = action.payload;
+    },
+
+    /* ---------------- MY MENTORS ---------------- */
+    setMyMentors(state, action: PayloadAction<any[]>) {
+      state.myMentors = action.payload;
+    },
+
+    /* ---------------- MY MENTEES ---------------- */
+    setMyMentees(state, action: PayloadAction<any[]>) {
+      state.myMentees = action.payload;
+    },
+
+    resetUserProfile: () => initialState,
   },
 });
 
-export const { setProfile, updateProfileField } = userProfileSlice.actions;
+/* ---------------- EXPORTS ---------------- */
+
+export const {
+  setProfile,
+  updateProfileField,
+
+  setMentorInfo,
+  updateMentorField,
+
+  setServices,
+  setCurrentGoals,
+  setMyMentors,
+  setMyMentees,
+
+  resetUserProfile,
+} = userProfileSlice.actions;
+
 export default userProfileSlice.reducer;

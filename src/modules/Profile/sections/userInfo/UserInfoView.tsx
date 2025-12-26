@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Snackbar } from "react-native-paper";
+
+
 import {
   View,
   Text,
@@ -8,6 +11,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  ToastAndroid, Platform,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../../../../redux/reactstore';
@@ -37,6 +41,7 @@ const Input: React.FC<InputProps> = ({ label, value, onChange }) => (
     />
   </View>
 );
+
 
 /* ---------- Section Header ---------- */
 const SectionHeader = ({
@@ -70,10 +75,11 @@ const UserInfoSection: React.FC = () => {
     about: false,
   });
 
+  const [snackVisible, setSnackVisible] = useState(false);
 
-useEffect(() => {
-  console.log("🧠 Redux Profile:", profile);
-}, [profile]);
+  useEffect(() => {
+    console.log("🧠 Redux Profile:", profile);
+  }, [profile]);
 
   useEffect(() => {
     dispatch(loadUserProfile());
@@ -83,6 +89,12 @@ useEffect(() => {
     dispatch(updateUserProfileField({ field, value }));
   };
 
+  const onUpdateProfile = async () => {
+    const success = await dispatch(submitUserProfileUpdate(profile)); // Call the function directly
+    if (success) {
+      setSnackVisible(true);
+    }
+  };
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
@@ -108,7 +120,7 @@ useEffect(() => {
           <Input label="City" value={profile.address?.city} onChange={v => change('address.city', v)} />
           <Input label="State" value={profile.address?.state} onChange={v => change('address.state', v)} />
           <Input label="Country" value={profile.address?.country} onChange={v => change('address.country', v)} />
-          <Input label="Zipcode" value={profile.address?.zipcode} onChange={v => change('address.zipcode', v)} />
+          <Input label="Zipcode" value={String(profile.address?.zipcode ?? '')} onChange={v => change('address.zipcode', v)} />
         </>
       )}
 
@@ -157,9 +169,15 @@ useEffect(() => {
       )}
 
       <View style={styles.buttonContainer}>
-        <Button title="Update Profile" onPress={() => dispatch(submitUserProfileUpdate())} />
+        <Button title="Update Profile" onPress={onUpdateProfile} />
       </View>
-
+      <Snackbar
+        visible={snackVisible}
+        onDismiss={() => setSnackVisible(false)}
+        duration={3000}
+      >
+        Profile updated successfully ✅
+      </Snackbar>
     </ScrollView>
   );
 };
