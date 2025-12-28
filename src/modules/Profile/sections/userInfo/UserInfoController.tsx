@@ -5,6 +5,8 @@ import {
 } from "../../../../redux/slices/userProfileSlice";
 import { UserInfoService } from "../../../UserInfo/UserInfoService";
 
+let isUpdating = false; // 🔒 module-level lock
+
 /* ---------------- LOAD USER PROFILE ---------------- */
 export const loadUserProfile = () => async (dispatch: AppDispatch) => {
   try {
@@ -34,6 +36,12 @@ export const updateUserProfileField =
 /* ---------------- SUBMIT PROFILE UPDATE ---------------- */
 export const submitUserProfileUpdate =
   () => async (dispatch: AppDispatch, getState: () => RootState) => {
+    if (isUpdating) {
+      console.warn("⛔ Update already in progress");
+      return;
+    }
+    isUpdating = true; // 🔒 LOCK
+
     try {
       console.log("🟡 submitUserProfileUpdate started");
 
@@ -115,6 +123,9 @@ export const submitUserProfileUpdate =
       await dispatch(loadUserProfile());
     } catch (error) {
       console.error("❌ submitUserProfileUpdate failed", error);
+    }finally {
+      isUpdating = false; // 🔓 UNLOCK
+      console.log("🟡 submitUserProfileUpdate ended");
     }
   };
 

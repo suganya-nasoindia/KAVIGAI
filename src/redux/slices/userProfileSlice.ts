@@ -37,7 +37,7 @@ type UserProfileState = {
   address: Address;
   education: string;
   academy: string;
-  photo:null|string;
+  photo: null | string;
   profession: string;
   experience: string;
   company: string;
@@ -52,7 +52,7 @@ type UserProfileState = {
   interests: string;
   awardsRecognitions: string;
   about: string;
- 
+
   /* NEW SEPARATED BLOCKS */
   mentorInfo: MentorInfo;
   services: any[];
@@ -126,12 +126,13 @@ const userProfileSlice = createSlice({
   reducers: {
 
     /* ---------------- PROFILE (UNCHANGED) ---------------- */
-    setProfile: (_, action: PayloadAction<Partial<UserProfileState>>) => {
+    setProfile: (state, action: PayloadAction<Partial<UserProfileState>>) => {
       return {
-        ...initialState,
+        ...state,
         ...action.payload,
+        mentorInfo: state.mentorInfo,
         address: {
-          ...initialState.address,
+          ...state.address,
           ...action.payload.address,
         },
       };
@@ -153,7 +154,11 @@ const userProfileSlice = createSlice({
 
     /* ---------------- MENTOR INFO ---------------- */
     setMentorInfo(state, action: PayloadAction<MentorInfo>) {
-      state.mentorInfo = action.payload;
+      state.mentorInfo =
+      {
+        ...state.mentorInfo,
+        ...action.payload,
+      }
     },
 
     updateMentorField(

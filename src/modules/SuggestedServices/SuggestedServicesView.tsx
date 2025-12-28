@@ -43,7 +43,7 @@ const SuggestedServicesView = () => {
 
     switch (item.type) {
       case Constants.PROFILEUPDATE:
-        navigation.navigate("ProfileUpdate");
+        navigation.navigate("Profile");
         break;
       case Constants.FINDMENTOR:
         navigation.navigate("FindMentor");

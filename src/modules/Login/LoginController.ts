@@ -5,9 +5,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginService } from "./LoginServices";
 import { LoginResponse } from "./LoginTypes";
 import { UserInfoService } from "../UserInfo/UserInfoService";
-import { setUserInfo } from "../../redux/actions";
+import {
+  setProfile,
+  setMentorInfo,
+  setServices,
+  setMyMentors,
+  setMyMentees,
+  setCurrentGoals,
+} from "../../redux/slices/userProfileSlice";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/reactstore";
+import { setUserInfo } from "../../redux/actions";
 
 
 export const useLoginController = (navigation: any) => {
@@ -97,16 +105,69 @@ export const useLoginController = (navigation: any) => {
       const userPayload =
         userInfoResponse?.data?.data?.content?.[0]?.user;
 
-      //console.log("User ID:", userPayload?.user?.userID);
-      const userId = userPayload?.user?.userID;
-      dispatch(setUserInfo(userPayload));
+      if (!userPayload) {
+        Alert.alert("Error", "Invalid user profile response");
+        return;
+      }
 
+      const {
+        user,
+        mentor,
+        services,
+        myMentors,
+        myMentees,
+        currentGoals,
+      } = userPayload;
+
+      /* ======================
+         5️⃣ STORE USER ID
+      ====================== */
+
+      const userId = user?.userID;
       if (userId) {
         await AsyncStorage.setItem("USER_ID", String(userId));
       }
-      const storedUserId = await AsyncStorage.getItem("USER_ID");
-console.log("Stored User ID:", storedUserId);
-      // /* ======================
+
+      /* ==================,====
+         6️⃣ DISPATCH REDUX
+      ====================== */
+
+      // 🔹 BASIC PROFILE ONLY
+      dispatch(setUserInfo(userPayload));
+
+      // 🔹 MENTOR INFO (SEPARATE)
+      if (mentor) {
+        dispatch(setMentorInfo(userPayload.mentor));
+      }
+
+      // 🔹 SERVICES
+      dispatch(setServices(services ?? []));
+
+      // 🔹 MY MENTORS
+      dispatch(setMyMentors(userPayload.myMentors ?? []));
+
+      // 🔹 MY MENTEES
+      dispatch(setMyMentees(userPayload.myMentees ?? []));
+
+      // 🔹 GOALS
+      dispatch(setCurrentGoals(userPayload.currentGoals ?? []));
+
+      console.log("🧠 mentorInfo:", userPayload.mentor);
+      console.log("🛠 services:", services);
+      console.log("👥 myMentors:", userPayload.myMentors);
+      console.log("👥 myMentees:", userPayload.myMentees);
+      console.log("🎯 goals:", userPayload.currentGoals);
+
+
+      //       //console.log("User ID:", userPayload?.user?.userID);
+      //       const userIdn               n  = userPayload?.user?.userID;
+      //       dispatch(setUserInfo(userPayload));
+      //       if (userId) {
+      //         await AsyncStorage.setItem("USER_ID", String(userId));
+      //       }
+      //       const storedUserId = await AsyncStorage.getItem("USER_ID");
+      // console.log("Stored User ID:", storedUserId);
+      //       // /* ======================
       //    4️⃣ SERVICES API
       // ====================== */
       // const servicesResponse =

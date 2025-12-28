@@ -77,7 +77,7 @@ export default function App() {
                 />
 
                 <Stack.Screen
-                  name="ProfileUpdate"
+                  name="Profile"
                   component={Profile}
                 />
                 {/* Start Your Journey page */}

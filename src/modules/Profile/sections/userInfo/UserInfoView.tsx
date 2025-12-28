@@ -11,7 +11,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
-  ToastAndroid, Platform,
+  Alert,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../../../../redux/reactstore';
@@ -64,6 +64,8 @@ const SectionHeader = ({
 /* ---------- View ---------- */
 const UserInfoSection: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [updating, setUpdating] = React.useState(false);
+
   const profile = useSelector((state: RootState) => state.userProfile);
 
   const [open, setOpen] = useState({
@@ -90,10 +92,21 @@ const UserInfoSection: React.FC = () => {
   };
 
   const onUpdateProfile = async () => {
-    const success = await dispatch(submitUserProfileUpdate(profile)); // Call the function directly
-    if (success) {
-      setSnackVisible(true);
+    if (updating) return; // UI guard
+
+    setUpdating(true);
+  
+    try {
+      await dispatch(submitUserProfileUpdate(profile));
+    } finally {
+      setUpdating(false);
     }
+    // const success = await dispatch(submitUserProfileUpdate(profile)); // Call the function directly
+    // if (success) {
+    //   setSnackVisible(true);
+    // }
+    Alert.alert('Success', 'User info saved!');
+    
   };
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -169,7 +182,8 @@ const UserInfoSection: React.FC = () => {
       )}
 
       <View style={styles.buttonContainer}>
-        <Button title="Update Profile" onPress={onUpdateProfile} />
+        <Button title={updating?"Update Inprogress":"Update Profile" }
+        onPress={onUpdateProfile} disabled = {updating} />
       </View>
       <Snackbar
         visible={snackVisible}
