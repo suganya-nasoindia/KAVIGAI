@@ -29,7 +29,7 @@ export const useLoginController = (navigation: any) => {
 
     try {
       /* ======================
-         1️⃣ LOGIN API
+         1️⃣ LOGIN APIs
       ====================== */
       const response: LoginResponse =
         await LoginService.login(username, password);
@@ -128,7 +128,7 @@ export const useLoginController = (navigation: any) => {
         await AsyncStorage.setItem("USER_ID", String(userId));
       }
 
-      /* ==================,====
+      /* ======================
          6️⃣ DISPATCH REDUX
       ====================== */
 
@@ -137,6 +137,11 @@ export const useLoginController = (navigation: any) => {
 
       // 🔹 MENTOR INFO (SEPARATE)
       if (mentor) {
+        const mentorID =userPayload.mentor?.mentorID;
+        console.log("Storing MENTOR_ID:", mentorID);
+        if(mentorID){
+          await AsyncStorage.setItem("MENTOR_ID", String(mentorID));
+        } 
         dispatch(setMentorInfo(userPayload.mentor));
       }
 
@@ -165,7 +170,7 @@ export const useLoginController = (navigation: any) => {
       //       if (userId) {
       //         await AsyncStorage.setItem("USER_ID", String(userId));
       //       }
-      //       const storedUserId = await AsyncStorage.getItem("USER_ID");
+      //       const storedUserId =c;
       // console.log("Stored User ID:", storedUserId);
       //       // /* ======================
       //    4️⃣ SERVICES API

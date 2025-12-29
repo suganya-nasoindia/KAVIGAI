@@ -117,8 +117,9 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     backgroundColor: '#F38A3E',
-    padding: 10,
+    padding: 5,
     borderRadius: 10,
+    margin:2,
   },
   tabSelected: {
     backgroundColor: '#e66e00',

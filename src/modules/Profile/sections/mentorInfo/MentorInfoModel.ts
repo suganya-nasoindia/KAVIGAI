@@ -2,6 +2,7 @@ export interface MentorInfo {
     mentorTitle: string;
     mentorDescription: string;
     mentoringField: string;
+    mentoringTags: string[];
     price: 'Free' | 'Paid';
     amount: number;
     discount: number;
@@ -13,6 +14,7 @@ export interface MentorInfo {
     mentorTitle: '',
     mentorDescription: '',
     mentoringField: '',
+    mentoringTags: [],
     price: 'Free',
     amount: 0,
     discount: 0,

@@ -28,6 +28,7 @@ const API_ENDPOINTS = {
     END_POINT_LANGUAGE_HANDLER: 'languagehandler',
     END_POINT_NOTIFICATION_HANDLER: 'notificationhandler',
     END_POINT_SUGGESTED_SERVICES_HANDLER: 'suggestedservicehandler',
+    END_POINT_MENTOR_HANDLER: 'mentorhandler',
 
 };
 

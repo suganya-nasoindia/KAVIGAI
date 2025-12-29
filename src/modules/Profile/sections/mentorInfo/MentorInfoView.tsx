@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,162 +7,123 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useMentorInfoController } from './MentorInfoController';
-import { useSelector } from 'react-redux';
+import { useSelector, shallowEqual } from 'react-redux';
 import type { RootState } from '../../../../redux/reactstore';
-
-
 
 const MentorInfoView = () => {
   const mentorInfo = useSelector(
-    (state: RootState) => state.userProfile.mentorInfo
+    (state: RootState) => state.userProfile.mentorInfo,
+    shallowEqual
   );
 
-  console.log('✅ mentorInfo from redux:', mentorInfo);
+  useEffect(() => {
+    console.log('✅ mentorInfo changed:', mentorInfo);
+  }, [mentorInfo]);
 
-  const { form, updateField, saveMentorInfo } =
+  const { form, updateField, saveMentorInfo, saving, auth } =
     useMentorInfoController();
 
-  const onSave = () => {
-    if (!form.mentorTitle?.trim()) {
-      Alert.alert('Validation', 'Mentor title is required');
-      return;
-    }
+  const onSave = async () => {
+    console.log('🟢 Save button pressed');
 
-    if (form.price === 'Paid' && form.amount <= 0) {
-      Alert.alert('Validation', 'Please enter a valid amount');
-      return;
-    }
+    const result = await saveMentorInfo();
 
-    saveMentorInfo();
-    Alert.alert('Success', 'Mentor info saved!');
+    console.log('🟢 saveMentorInfo result:', result);
+
+    if (result?.success) {
+      Alert.alert('Success', result.message);
+    } else {
+      Alert.alert('Error', result?.message || 'Failed');
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.label}>Mentor Title</Text>
+      <TextInput
+        style={styles.input}
+        value={form.mentorTitle}
+        onChangeText={t => updateField('mentorTitle', t)}
+      />
 
-        <Text style={styles.label}>Mentor Title</Text>
-        <TextInput
-          style={styles.input}
-          value={form.mentorTitle}
-          onChangeText={text => updateField('mentorTitle', text)}
+      <Text style={styles.label}>Description</Text>
+      <TextInput
+        style={[styles.input, styles.multiline]}
+        multiline
+        value={form.mentorDescription}
+        onChangeText={t => updateField('mentorDescription', t)}
+      />
+
+      <Text style={styles.label}>Mentor Tags</Text>
+      <TextInput
+        style={styles.input}
+        value={form.mentorTags.join(', ')}
+        onChangeText={t =>
+          updateField(
+            'mentorTags',
+            t.split(',').map(v => v.trim())
+          )
+        }
+      />
+
+      <Text style={styles.label}>Mentoring Field</Text>
+      <TextInput
+        style={styles.input}
+        value={form.mentoringField}
+        onChangeText={t => updateField('mentoringField', t)}
+      />
+
+      <Text style={styles.label}>Price</Text>
+      <Picker
+        selectedValue={form.price}
+        onValueChange={v => updateField('price', v)}
+      >
+        <Picker.Item label="Free" value="Free" />
+        <Picker.Item label="Paid" value="Paid" />
+      </Picker>
+
+      <Text style={styles.label}>Amount</Text>
+      <TextInput
+        style={[
+          styles.input,
+          form.price === 'Free' && styles.disabled,
+        ]}
+        editable={form.price === 'Paid'}
+        keyboardType="numeric"
+        value={String(form.amount)}
+        onChangeText={t => updateField('amount', Number(t) || 0)}
+      />
+
+      <Text style={styles.label}>Discount</Text>
+      <TextInput
+        style={[
+          styles.input,
+          form.amount === 0 && styles.disabled,
+        ]}
+        editable={form.amount > 0}
+        keyboardType="numeric"
+        value={String(form.discount)}
+        onChangeText={t => updateField('discount', Number(t) || 0)}
+      />
+
+      <Text style={styles.label}>Availability</Text>
+      <TextInput
+        style={styles.input}
+        value={form.availability}
+        onChangeText={t => updateField('availability', t)}
+      />
+
+      <View style={{ marginTop: 24 }}>
+        <Button
+          title={saving ? 'Updating...' : 'Save'}
+          onPress={onSave}
+          disabled={saving || !auth.loginName || !auth.mentorID}
         />
-
-        <Text style={styles.label}>Mentor Description</Text>
-        <TextInput
-          style={[styles.input, styles.multiline]}
-          multiline
-          value={form.mentorDescription}
-          onChangeText={text =>
-            updateField('mentorDescription', text)
-          }
-        />
-
-        <Text style={styles.label}>Mentor Tags</Text>
-        <TextInput
-          style={styles.input}
-          value={form.mentorTags.join(', ')}
-          onChangeText={text =>
-            updateField(
-              'mentorTags',
-              text.split(',').map(t => t.trim())
-            )
-          }
-        />
-
-
-        <Text style={styles.label}>Mentoring Field</Text>
-        <TextInput
-          style={styles.input}
-          value={form.mentoringField}
-          onChangeText={text =>
-            updateField('mentoringField', text)
-          }
-        />
-
-        <Text style={styles.label}>Price</Text>
-        <View style={styles.picker}>
-          <Picker
-            selectedValue={form.price}
-            onValueChange={value =>
-              updateField('price', value)
-            }
-          >
-            <Picker.Item label="Free" value="Free" />
-            <Picker.Item label="Paid" value="Paid" />
-          </Picker>
-        </View>
-
-        <Text style={styles.label}>Amount</Text>
-        <TextInput
-          style={[
-            styles.input,
-            form.price === 'Free' && styles.disabledInput,
-          ]}
-          editable={form.price === 'Paid'}
-          keyboardType="numeric"
-          value={String(form.amount ?? 0)}
-          onChangeText={text =>
-            updateField('amount', Number(text) || 0)
-          }
-        />
-
-        <Text style={styles.label}>Discount</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={String(form.discount ?? 0)}
-          onChangeText={text =>
-            updateField('discount', Number(text) || 0)
-          }
-        />
-
-        <Text style={styles.label}>Currency</Text>
-        <View style={styles.picker}>
-          <Picker
-            selectedValue={form.currencyType}
-            onValueChange={value =>
-              updateField('currencyType', value)
-            }
-          >
-            <Picker.Item label="INR" value="INR" />
-            <Picker.Item label="USD" value="USD" />
-            <Picker.Item label="EUR" value="EUR" />
-          </Picker>
-        </View>
-
-        <Text style={styles.label}>Ratings</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={String(form.ratings || '')}
-          onChangeText={text =>
-            updateField('ratings', Number(text) || 0)
-          }
-        />
-
-        <Text style={styles.label}>Availability</Text>
-        <TextInput
-          style={styles.input}
-          value={form.availability}
-          onChangeText={text =>
-            updateField('availability', text)
-          }
-        />
-
-        <View style={{ marginTop: 24 }}>
-          <Button title="Save" onPress={onSave} />
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -170,7 +131,6 @@ export default MentorInfoView;
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 80 },
-  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
   label: { marginTop: 12, fontWeight: 'bold' },
   input: {
     borderWidth: 1,
@@ -178,18 +138,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 8,
     marginTop: 4,
+    backgroundColor: '#ffffff', // ✅ FORCE WHITE
+    color: '#000000',           // ✅ Ensure text is visible
+
   },
   multiline: {
     height: 80,
-    textAlignVertical: 'top',
+    backgroundColor: '#ffffff', // ✅ FORCE WHITE
+    color: '#000000',           // ✅ Ensure text is visible
   },
-  picker: {
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 6,
-    marginTop: 4,
-  },
-  disabledInput: {
-    backgroundColor: '#f0f0f0',
-  },
+  disabled: { backgroundColor: '#eee' },
 });
