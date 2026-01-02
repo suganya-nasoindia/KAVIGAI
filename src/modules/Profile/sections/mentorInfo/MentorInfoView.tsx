@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  Pressable,
   StyleSheet,
   ScrollView,
   Alert,
@@ -109,6 +109,22 @@ const MentorInfoView = () => {
         onChangeText={t => updateField('discount', Number(t) || 0)}
       />
 
+      <Text style={styles.label}>Currency</Text>
+      <View style={styles.picker}>
+        <Picker selectedValue={form.currencyType}
+          onValueChange={value => updateField('currencyType', value)} >
+          <Picker.Item label="INR" value="INR" />
+          <Picker.Item label="USD" value="USD" />
+          <Picker.Item label="EUR" value="EUR" />
+        </Picker>
+      </View>
+      <Text style={styles.label}>Ratings</Text>
+      <TextInput style={styles.input} keyboardType="numeric"
+        value={String(form.ratings || '')}
+        onChangeText={text => updateField('ratings', Number(text) || 0)}
+        editable={false}
+        selectTextOnFocus={false}
+        />
       <Text style={styles.label}>Availability</Text>
       <TextInput
         style={styles.input}
@@ -117,11 +133,18 @@ const MentorInfoView = () => {
       />
 
       <View style={{ marginTop: 24 }}>
-        <Button
-          title={saving ? 'Updating...' : 'Save'}
+        <Pressable
           onPress={onSave}
-          disabled={saving || !auth.loginName || !auth.mentorID}
-        />
+          disabled={saving}
+          style={[
+            styles.saveButton,
+            saving && styles.disabledButton,
+          ]}
+        >
+          <Text style={styles.saveButtonText}>
+            {saving ? 'Updating...' : 'Save'}
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -148,4 +171,20 @@ const styles = StyleSheet.create({
     color: '#000000',           // ✅ Ensure text is visible
   },
   disabled: { backgroundColor: '#eee' },
+  saveButton: {
+    marginTop: 24,
+    backgroundColor: '#4682B4',
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#9bbbd4',
+  },
+  picker: { borderWidth: 1, borderColor: '#bbb', borderRadius: 6, marginTop: 4, },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

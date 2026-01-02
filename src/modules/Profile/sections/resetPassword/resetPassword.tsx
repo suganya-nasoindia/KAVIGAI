@@ -1,30 +1,91 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 
 const ResetPasswordSection = () => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Password validation regex
+  const pwdRegex = /^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,16}$/;
+
+  const handleCancel = () => {
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setErrorMessage('');
+  };
+
+  const handleUpdate = () => {
+    // Validate new password
+    if (!pwdRegex.test(newPassword)) {
+      setErrorMessage(
+        'Password must be 8-16 characters, no spaces, and can include letters, numbers, and symbols.'
+      );
+      return;
+    }
+
+    // Validate confirm password
+    if (newPassword !== confirmPassword) {
+      setErrorMessage('New password and confirm password do not match.');
+      return;
+    }
+
+    setErrorMessage('');
+    console.log('Password updated successfully!');
+    // 🔒 Call API here
+  };
+
   return (
     <View style={styles.section}>
-      <Text style={styles.title}>Reset Password</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Current Password"
         secureTextEntry
+        value={currentPassword}
+        onChangeText={setCurrentPassword}
       />
+
       <TextInput
         style={styles.input}
         placeholder="New Password"
         secureTextEntry
+        value={newPassword}
+        onChangeText={setNewPassword}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Confirm New Password"
         secureTextEntry
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Update Password</Text>
-      </TouchableOpacity>
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.button, styles.cancelButton]}
+          onPress={handleCancel}
+        >
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.updateButton]}
+          onPress={handleUpdate}
+        >
+          <Text style={styles.updateText}>Update</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -33,30 +94,43 @@ export default ResetPasswordSection;
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: '#FFECD2',
-    padding: 12,
-    borderRadius: 10,
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 8,
+    padding: 16,
   },
   input: {
-    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 8,
-    padding: 10,
-    marginVertical: 6,
+    padding: 12,
+    marginBottom: 12,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
   },
   button: {
-    backgroundColor: '#F38A3E',
+    flex: 1,
     padding: 12,
     borderRadius: 8,
-    marginTop: 10,
     alignItems: 'center',
+    marginHorizontal: 4,
   },
-  buttonText: {
+  cancelButton: {
+    backgroundColor: '#eee',
+  },
+  updateButton: {
+    backgroundColor: '#007bff',
+  },
+  cancelText: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  updateText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
   },
 });

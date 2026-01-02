@@ -146,7 +146,13 @@ export const useLoginController = (navigation: any) => {
       }
 
       // 🔹 SERVICES
-      dispatch(setServices(services ?? []));
+      dispatch(setServices(userPayload.services.map((service: any) => ({
+        serviceID: service.serviceID,
+        serviceName: service.serviceName,
+        description: service.description,
+        isActive: Boolean(service.status), // 🔥 THIS LINE
+      }))
+    ));
 
       // 🔹 MY MENTORS
       dispatch(setMyMentors(userPayload.myMentors ?? []));

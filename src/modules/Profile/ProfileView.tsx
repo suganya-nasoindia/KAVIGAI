@@ -112,14 +112,14 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 12,
-    paddingHorizontal: 8,
+    marginVertical: 5,
+    paddingHorizontal: 6,
   },
   tabButton: {
     backgroundColor: '#F38A3E',
-    padding: 5,
+    padding: 10,
     borderRadius: 10,
-    margin:2,
+    margin:0.5,
   },
   tabSelected: {
     backgroundColor: '#e66e00',
