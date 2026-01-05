@@ -46,10 +46,10 @@ const SuggestedServicesView = () => {
         navigation.navigate("Profile");
         break;
       case Constants.FINDMENTOR:
-        navigation.navigate("FindMentor");
+        navigation.navigate("AvailableMentors");
         break;
       case Constants.SETAGOAL:
-        navigation.navigate("SetGoal");
+        navigation.navigate("GoalTemplate");
         break;
       case Constants.TAKEATOUR:
         Linking.openURL(Constants.TAKE_A_TOUR_URL);

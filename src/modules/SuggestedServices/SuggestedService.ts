@@ -5,6 +5,23 @@ import API_ENDPOINTS  from "../../services/api/endpoints";
 import { SuggestedServiceResponse } from "./SuggestedServicesTypes";
 import Utilities from "../../Components/Utilities";
 
+
+const sanitizeObject = (obj: any): any => {
+  if (typeof obj === 'string') {
+    return obj.trim();
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeObject);
+  }
+  if (typeof obj === 'object' && obj !== null) {
+    return Object.keys(obj).reduce((acc, key) => {
+      acc[key] = sanitizeObject(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+};
+
 export const SuggestedServicesService = {
   async fetchServices(apiKey: string, accessToken: string, loginName: string) {
     try {
@@ -14,8 +31,7 @@ export const SuggestedServicesService = {
       };
 
       const requestBody = {
-        data: JSON.stringify({
-          info: {
+          info:{
             actionType: "showall",
             platformType: "android",
             type: "android",
@@ -25,21 +41,23 @@ export const SuggestedServicesService = {
             suggestedserviceEndDateTime: Utilities.getCurrentDateAndTimeInUTC(),
             currentTimezone: Utilities.getCurrentTimeZone(),
           },
-          data: {
-            content: {
+          data:{
+            content:{
               apiKey,
               loginName,
             },
-          },
-        }),
+        },
+      };
+      const servicesRequestBody = {
+        data:JSON.stringify(sanitizeObject(requestBody)),
       };
       console.log("ApiClient is :", POSTMethod);
 
-      console.log("📤 Fetching Suggested Services:", requestBody);
+      console.log("📤 Fetching Suggested Services:", servicesRequestBody);
 
       const response = await POSTMethod<SuggestedServiceResponse>(
         API_ENDPOINTS.END_POINT_SUGGESTED_SERVICES_HANDLER,
-        requestBody,
+        servicesRequestBody,
         headers
       );
 

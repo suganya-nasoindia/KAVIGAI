@@ -24,6 +24,14 @@ type MentorInfo = {
   availability: string;
 };
 
+
+type Service = {
+  serviceID: number;
+  serviceName?: string;
+  description?: string;
+  isActive: boolean; // 👈 REQUIRED
+};
+
 type UserProfileState = {
   /* BASIC PROFILE (UNCHANGED) */
   userID: number | null;
@@ -124,7 +132,36 @@ const userProfileSlice = createSlice({
   name: "userProfile",
   initialState,
   reducers: {
-
+    toggleServiceStatus: (
+      state,
+      action: PayloadAction<{ serviceID: number; isActive: boolean }>
+    ) => {
+      const { serviceID, isActive } = action.payload;
+      const service = state.services.find(
+        s => s.serviceID === serviceID
+      );
+      if (service) {
+        service.isActive = isActive;
+      }
+    },
+  
+    setUpdatedServices: (
+      state,
+      action: PayloadAction<
+        { serviceID: number; serviceStatus: boolean }[]
+      >
+    ) => {
+      state.services = state.services.map(service => {
+        const updated = action.payload.find(
+          s => s.serviceID === service.serviceID
+        );
+    
+        return updated
+          ? { ...service, isActive: updated.serviceStatus }
+          : service;
+      });
+    },
+    
     /* ---------------- PROFILE (UNCHANGED) ---------------- */
     setProfile: (state, action: PayloadAction<Partial<UserProfileState>>) => {
       return {
@@ -169,7 +206,7 @@ const userProfileSlice = createSlice({
     },
 
     /* ---------------- SERVICES ---------------- */
-    setServices(state, action: PayloadAction<any[]>) {
+    setServices(state, action: PayloadAction<Service[]>) {
       state.services = action.payload;
     },
 
@@ -205,7 +242,7 @@ export const {
   setCurrentGoals,
   setMyMentors,
   setMyMentees,
-
+  toggleServiceStatus,setUpdatedServices,
   resetUserProfile,
 } = userProfileSlice.actions;
 

@@ -35,15 +35,17 @@ export const saveUserServices =
       };
 
       const payload = {
+        data: JSON.stringify({
         info: {
           type: 'mobile',
           actionType: 'updateall',
           platformType: 'mobile',
           outputType: 'json',
         },
-        data: JSON.stringify({
+        data: {
           content, // ✅ STRINGIFIED
-        }),
+        },
+      }),
       };
 
       const response = await POSTMethod(API_ENDPOINTS.END_POINT_USER_HANDLER, payload);
