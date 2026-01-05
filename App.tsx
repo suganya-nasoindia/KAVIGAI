@@ -22,8 +22,10 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SuggestedServicesView from './src/modules/SuggestedServices/SuggestedServicesView';
 import WelcomeScreen from './src/screens/WelcomeScreen/WelcomeScreen';
-
+import HomeScreen from './src/modules/Home/homescreen';
 import Profile from './src/modules/Profile';
+import AvailableMentors from './src/modules/Mentors/AvailableMentors';
+import GoalTemplates from './src/modules/GoalTemplate/GoalTemplates';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -31,6 +33,8 @@ export type RootStackParamList = {
   WelcomeScreen: undefined;
   Login: undefined;
   StartJourney: undefined;
+  AvailableMentor: undefined;
+  Home: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -80,6 +84,16 @@ export default function App() {
                   name="Profile"
                   component={Profile}
                 />
+
+                <Stack.Screen
+                  name="AvailableMentors"
+                  component={AvailableMentors}
+                />
+
+                <Stack.Screen
+                  name="GoalTemplate"
+                  component={GoalTemplates}
+                />
                 {/* Start Your Journey page */}
                 <Stack.Screen
                   name="StartJourney"
@@ -95,6 +109,12 @@ export default function App() {
                       </TouchableOpacity>
                     ),
                   })} />
+
+                <Stack.Screen
+                  name="Home"
+                  component={HomeScreen}
+                  options={{ headerShown: false }}
+                />
               </Stack.Navigator>
             </NavigationContainer>
           </PaperProvider>
