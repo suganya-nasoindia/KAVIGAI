@@ -73,6 +73,8 @@ class Utilities {
     return utc.toISOString().replace("T", " ").substring(0, 19);
   }
 
+
+  
   /** Format date for display */
   static displayDateFormat(inputDate: string): string {
     try {

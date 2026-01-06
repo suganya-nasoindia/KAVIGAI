@@ -19,11 +19,11 @@ const BASE_URL = "https://api.kavigai.com/api/v1/index.php/";
 -------------------------------------*/
 const getAuthHeaders = async () => {
   const token = await AsyncStorage.getItem("AUTH_TOKEN");
-  const apiKey = await AsyncStorage.getItem("API_KEY");
+
+  if (!token) return {};
 
   return {
-    Authorization: apiKey ? `Bearer ${token}` : "",
-    "X-Auth-Token": token ?? "",
+    Authorization: `Bearer ${token.trim()}`,
   };
 };
 

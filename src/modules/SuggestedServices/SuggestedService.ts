@@ -25,10 +25,9 @@ const sanitizeObject = (obj: any): any => {
 export const SuggestedServicesService = {
   async fetchServices(apiKey: string, accessToken: string, loginName: string) {
     try {
-      const headers = {
-        "X-Auth-Token": accessToken,
-        Authorization: apiKey,
-      };
+      // const headers = {
+      //   Authorization: `Bearer ${accessToken.trim()}`,
+      // };
 
       const requestBody = {
           info:{
@@ -49,8 +48,7 @@ export const SuggestedServicesService = {
         },
       };
       const servicesRequestBody = {
-        data:JSON.stringify(sanitizeObject(requestBody)),
-      };
+        data:JSON.stringify(sanitizeObject(requestBody))      };
       console.log("ApiClient is :", POSTMethod);
 
       console.log("📤 Fetching Suggested Services:", servicesRequestBody);
@@ -58,7 +56,6 @@ export const SuggestedServicesService = {
       const response = await POSTMethod<SuggestedServiceResponse>(
         API_ENDPOINTS.END_POINT_SUGGESTED_SERVICES_HANDLER,
         servicesRequestBody,
-        headers
       );
 
       console.log("📥 Suggested Services Response:", response);

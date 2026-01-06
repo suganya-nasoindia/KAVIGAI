@@ -24,7 +24,7 @@ export const getAvailableGoalTemplate = async (): Promise<GoalTemplate[]> => {
       }),
     };
    const response = await POSTMethod<any>(
-      API_ENDPOINTS.END_POINT_MYMENTOR_HANDLER,
+      API_ENDPOINTS.END_POINT_GOAL_TEMPLATE_HANDLER,
       requestBody
     );
 

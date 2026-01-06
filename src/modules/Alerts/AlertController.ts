@@ -38,12 +38,10 @@ export const useAlertController = () => {
   useEffect(() => {
     const loadAuthData = async () => {
       const values = await AsyncStorage.multiGet([
-        'API_KEY',
         'AUTH_TOKEN',
-        'LOGIN_NAME',
       ]);
 
-      setApiKey(values[0][1] || reduxAuth?.apiKey || null);
+     
       setAccessToken(values[1][1] || reduxAuth?.accessToken || null);
       setLoginName(values[2][1] || reduxAuth?.loginName || null);
     };
@@ -59,10 +57,10 @@ export const useAlertController = () => {
 
     const fetchAlerts = async () => {
       try {
-        const headers = {
-          'X-Auth-Token': accessToken.trim(),
-          Authorization: apiKey.trim(),
-        };
+        // const headers = {
+        //   'X-Auth-Token': accessToken.trim(),
+        //   Authorization: apiKey.trim(),
+        // };
 
         const requestPayload = {
           info: {
@@ -81,7 +79,6 @@ export const useAlertController = () => {
         const response: AlertApiResponse = await POSTMethod(
           API_ENDPOINTS.END_POINT_ALERT_HANDLER,
           { data: JSON.stringify(requestPayload) },
-          headers
         );
 
         if (response?.status?.statusCode === 200) {
