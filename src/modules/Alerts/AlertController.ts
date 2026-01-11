@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Dimensions } from 'react-native';
-import { useSelector } from 'react-redux';
 import { DataProvider, LayoutProvider } from 'recyclerlistview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,57 +11,50 @@ import type { AlertItem, AlertApiResponse } from './AlertModel';
 const { width } = Dimensions.get('window');
 
 export const useAlertController = () => {
-  const reduxAuth = useSelector((state: any) => state.auth);
-
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [loginName, setLoginName] = useState<string | null>(null);
+  const [loginName, setLoginName] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const [dataProvider, setDataProvider] = useState(
     new DataProvider<AlertItem>((r1, r2) => r1 !== r2)
   );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const layoutProvider = new LayoutProvider(
-    () => 0,
-    (_, dim) => {
-      dim.width = width;
-      dim.height = 95;
-    }
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        () => 0,
+        (_, dim) => {
+          dim.width = width;
+          dim.height = 95;
+        }
+      ),
+    []
   );
 
-  /* =========================
-     LOAD AUTH DATA
-  ========================= */
+  /* Load auth */
   useEffect(() => {
-    const loadAuthData = async () => {
-      const values = await AsyncStorage.multiGet([
-        'AUTH_TOKEN',
-      ]);
+    const loadAuth = async () => {
+      const name = await AsyncStorage.getItem('LOGIN_NAME');
+      const key = await AsyncStorage.getItem('API_KEY');
 
-     
-      setAccessToken(values[1][1] || reduxAuth?.accessToken || null);
-      setLoginName(values[2][1] || reduxAuth?.loginName || null);
+      setLoginName(name?.trim() || '');
+      setApiKey(key?.trim() || '');
     };
 
-    loadAuthData();
-  }, [reduxAuth]);
+    loadAuth();
+  }, []);
 
-  /* =========================
-     FETCH ALERTS
-  ========================= */
+  /* Fetch alerts */
   useEffect(() => {
-    if (!apiKey || !accessToken || !loginName) return;
+    if (!loginName || !apiKey) return;
 
     const fetchAlerts = async () => {
       try {
-        // const headers = {
-        //   'X-Auth-Token': accessToken.trim(),
-        //   Authorization: apiKey.trim(),
-        // };
+        setLoading(true);
+        setError(null);
 
-        const requestPayload = {
+        const payload = {
           info: {
             actionType: 'showall',
             platformType: 'android',
@@ -72,34 +64,32 @@ export const useAlertController = () => {
             currentTimezone: Utilities.getCurrentTimeZone(),
           },
           data: {
-            loginName: loginName.trim(), // ✅ SPACE REMOVED
+            content: { apiKey, loginName, }
           },
         };
 
-        const response: AlertApiResponse = await POSTMethod(
+        const response = await POSTMethod<AlertApiResponse>(
           API_ENDPOINTS.END_POINT_ALERT_HANDLER,
-          { data: JSON.stringify(requestPayload) },
+          { data: JSON.stringify(payload) }
         );
 
-        if (response?.status?.statusCode === 200) {
-          setDataProvider(
-            new DataProvider<AlertItem>((r1, r2) => r1 !== r2).cloneWithRows(
-              response?.data?.content ?? []
-            )
+        if (response.success && response.data?.status?.statusCode === 200) {
+          setDataProvider(prev =>
+            prev.cloneWithRows(response.data.data?.content ?? [])
           );
         } else {
-          Alert.alert('Error', 'Unable to fetch alerts.');
+          Alert.alert('Error', response.error || 'Unable to fetch alerts');
         }
       } catch (err: any) {
         setError(err);
-        Alert.alert('Error', err?.message || 'Something went wrong');
+        Alert.alert('Error', err.message || 'Something went wrong');
       } finally {
         setLoading(false);
       }
     };
 
     fetchAlerts();
-  }, [apiKey, accessToken, loginName]);
+  }, [loginName, apiKey]);
 
   return {
     dataProvider,
@@ -107,4 +97,85 @@ export const useAlertController = () => {
     loading,
     error,
   };
+};
+
+
+export const getAlertById = async (alertID: number) => {
+  try {
+    const apiKey = await AsyncStorage.getItem('API_KEY');
+    const loginName = await AsyncStorage.getItem('LOGIN_NAME');
+
+    const requestPayload = {
+      info: {
+        type: 'mobile',
+        actionType: 'show',
+        platformType: 'mobile',
+        outputType: 'json',
+      },
+      data: {
+        content: {
+          apiKey: apiKey ?? '',
+          alertNotificationID: alertID,
+          loginName: loginName ?? '',
+        },
+      },
+    };
+
+    const response = await POSTMethod(
+      API_ENDPOINTS.END_POINT_ALERT_HANDLER,
+      {
+        data: JSON.stringify(requestPayload),
+      }
+    );
+
+    if (response.success && response.data?.status?.statusCode === 200) {
+      // 🔹 Return alert details object
+      return response.data.data?.content ?? null;
+    }
+
+    throw new Error(response.error || 'Failed to fetch alert details');
+  } catch (error) {
+    console.error('getAlertById error:', error);
+    throw error;
+  }
+};
+
+export const deleteAlertById = async (alertID: number) => {
+  try {
+    const apiKey = await AsyncStorage.getItem('API_KEY');
+    const loginName = await AsyncStorage.getItem('LOGIN_NAME');
+
+    const requestPayload = {
+      info: {
+        type: 'mobile',
+        actionType: 'delete',
+        platformType: 'mobile',
+        outputType: 'json',
+      },
+      data: {
+        content: {
+          apiKey: apiKey ?? '',
+          alertNotificationID: alertID,
+          loginName: loginName ?? '',
+        },
+      },
+    };
+
+    const response = await POSTMethod(
+      API_ENDPOINTS.END_POINT_ALERT_HANDLER,
+      {
+        data: JSON.stringify(requestPayload),
+      }
+    );
+
+    if (response.success && response.data?.status?.statusCode === 200) {
+      // 🔹 Return alert details object
+      return response.data.data?.content ?? null;
+    }
+
+    throw new Error(response.error || 'Failed to fetch alert details');
+  } catch (error) {
+    console.error('getAlertById error:', error);
+    throw error;
+  }
 };

@@ -5,27 +5,52 @@ import {
   View,
   Text,
   ActivityIndicator,
+  TouchableOpacity,
   StyleSheet,
   Image,
 } from 'react-native';
 import { RecyclerListView } from 'recyclerlistview';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAlertController } from './AlertController';
 import type { AlertItem } from './AlertModel';
 
-export default function AlertView() {
-  const { dataProvider, layoutProvider, loading, error } =
-    useAlertController();
+/* =========================
+   NAVIGATION TYPES
+========================= */
 
-  const rowRenderer = (_: number, item: AlertItem) => (
+type AppStackParamList = {
+  Alerts: undefined;
+  AlertDetails: { alertId: number };
+};
+
+// type NavigationProp =
+//   NativeStackNavigationProp<AppStackParamList, 'Alerts'>;
+
+/* =========================
+   ROW COMPONENT
+========================= */
+
+type AlertRowProps = {
+  item: AlertItem;
+  onPress: (item: AlertItem) => void;
+};
+
+const AlertRow = ({ item, onPress }: AlertRowProps) => (
+  <TouchableOpacity onPress={() => onPress(item)}>
     <View style={styles.card}>
       <Image
         source={require('../../assets/alerts.png')}
         style={styles.icon}
       />
       <View style={styles.content}>
-        <Text style={styles.timestamp}>{item.sentDate || 'No Date'}</Text>
-        <Text style={styles.title}>{item.title || 'No Title'}</Text>
+        <Text style={styles.timestamp}>
+          {item.sentDate || 'No Date'}
+        </Text>
+        <Text style={styles.title}>
+          {item.title || 'No Title'}
+        </Text>
         <Text
           style={styles.message}
           numberOfLines={1}
@@ -35,12 +60,43 @@ export default function AlertView() {
         </Text>
       </View>
     </View>
-  );
+  </TouchableOpacity>
+);
+
+/* =========================
+   VIEW
+========================= */
+
+export default function AlertView() {
+  const navigation =
+  useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+
+  const { dataProvider, layoutProvider, loading, error } =
+    useAlertController();
+
+    // useFocusEffect(
+    //   React.useCallback(() => {
+    //     fetchAlerts();
+    //   }, [])
+    // );
+  const onAlertPress = (item: AlertItem) => {
+    console.log('Alert pressed:', item);
+    console.log('Navigating to AlertDetails with ID:', item.alertNotificationID);
+    if (!item.alertNotificationID) return;
+    navigation.navigate('AlertDetails', {
+      alertId: item.alertNotificationID,
+    });
+  };
+
+  const rowRenderer = (_: number, item: AlertItem) => {
+    console.log('ROW ITEM:', item.alertNotificationID);
+    return <AlertRow item={item} onPress={onAlertPress} />;
+  };
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#498ABF" />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
@@ -56,26 +112,31 @@ export default function AlertView() {
     );
   }
 
+  if (dataProvider.getSize() === 0) {
+    return (
+      <View style={styles.noAlertsContainer}>
+        <Text style={styles.emptyText}>No Alerts available.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {dataProvider.getSize() > 0 ? (
-        <RecyclerListView
-          layoutProvider={layoutProvider}
-          dataProvider={dataProvider}
-          rowRenderer={rowRenderer}
-        />
-      ) : (
-        <View style={styles.noAlertsContainer}>
-          <Text style={styles.emptyText}>No Alerts available.</Text>
-        </View>
-      )}
+      <RecyclerListView
+        layoutProvider={layoutProvider}
+        dataProvider={dataProvider}
+        rowRenderer={rowRenderer}
+      />
     </View>
   );
 }
 
+/* =========================
+   STYLES
+========================= */
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFE8C7' },
-
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -86,64 +147,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#DCDCDC',
     margin: 5,
   },
-
-  icon: {
-    width: 40,
-    height: 40,
-    marginRight: 15,
-  },
-
+  icon: { width: 40, height: 40, marginRight: 15 },
   content: { flex: 1 },
-
-  timestamp: {
-    fontSize: 12,
-    color: '#646464',
-    marginBottom: 4,
-  },
-
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#505050',
-    marginBottom: 4,
-  },
-
-  message: {
-    fontSize: 14,
-    color: '#646464',
-  },
-
+  timestamp: { fontSize: 12, color: '#646464', marginBottom: 4 },
+  title: { fontSize: 16, fontWeight: 'bold', color: '#505050' },
+  message: { fontSize: 14, color: '#646464' },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  loadingText: {
-    fontSize: 18,
-    color: '#498ABF',
-  },
-
+  loadingText: { fontSize: 18, color: '#498ABF', marginTop: 8 },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  errorText: {
-    fontSize: 16,
-    color: 'red',
-  },
-
+  errorText: { fontSize: 16, color: 'red' },
   noAlertsContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  emptyText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#505050',
-  },
+  emptyText: { fontSize: 16, color: '#505050' },
 });

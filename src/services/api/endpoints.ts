@@ -29,7 +29,7 @@ const API_ENDPOINTS = {
     END_POINT_NOTIFICATION_HANDLER: 'notificationhandler',
     END_POINT_SUGGESTED_SERVICES_HANDLER: 'suggestedservicehandler',
     END_POINT_MENTOR_HANDLER: 'mentorhandler',
-    END_POINT_ALERT_HANDLER: 'alerthandler',
+    END_POINT_ALERT_HANDLER: 'alertnotificationhandler',
 
 };
 

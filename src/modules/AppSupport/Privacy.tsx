@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
-import Constants from '../../components/Constants';
+import Constants from '../../Components/Constants';
 
 /* =========================
    MODEL

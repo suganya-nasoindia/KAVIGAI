@@ -16,6 +16,7 @@ import {
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/reactstore";
 import { setUserInfo } from "../../redux/actions";
+import { loginSuccess } from '../../redux/slices/authslice';
 
 
 export const useLoginController = (navigation: any) => {
@@ -26,6 +27,7 @@ export const useLoginController = (navigation: any) => {
 
   const handleLogin = async () => {
     setLoading(true);
+    dispatch(loginSuccess());   // 🔥 THIS IS THE SWITCH
 
     try {
       /* ======================
@@ -203,7 +205,7 @@ export const useLoginController = (navigation: any) => {
          5️⃣ NAVIGATION (ONLY NOW)
       ====================== */
       navigation.replace(
-        firstTime ? "WelcomeScreen" : "Dashboard"
+        firstTime ? "WelcomeScreen" : "HomeScreen"
       );
 
     } catch (err) {

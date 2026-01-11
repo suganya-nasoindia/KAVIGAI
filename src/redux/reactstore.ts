@@ -2,7 +2,7 @@
 
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import userProfileReducer from './slices/userProfileSlice';
-import { authReducer } from './reducer';
+import  authReducer  from './slices/authslice';
 
 // ----------------------------------------
 // ROOT REDUCER
@@ -17,6 +17,7 @@ const rootReducer = combineReducers({
 // ----------------------------------------
 export const store = configureStore({
   reducer: rootReducer,
+
 });
 
 // ----------------------------------------

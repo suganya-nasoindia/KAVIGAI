@@ -1,12 +1,16 @@
 import React from 'react';
-import { Image, SafeAreaView, StyleSheet } from 'react-native';
+import { Image, Alert,SafeAreaView, StyleSheet,TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 
 // import TodayScreen from '../today';
 // import TodoScreen from '../todo';
 // import ServicesScreen from '../services';
 import AlertScreen from '../Alerts';
-
+import TermsScreen from '../AppSupport/Terms';
+import PrivacyScreen from '../AppSupport/Privacy';
+import TodoScreen from '../Todo/TodoListScreen';
+import TodayScreen from '../Today/TodayView';
 /* =========================
    MODEL
 ========================= */
@@ -15,16 +19,21 @@ const TABS = [
   {
     name: 'Today',
     icon: require('../../assets/today.png'),
-    component: AlertScreen,
+    component: TodayScreen,
   },
   {
-    name: 'Alerts',
+    name: 'Todo',
     icon: require('../../assets/todo.png'),
-    component: AlertScreen,
+    component: TodoScreen,
   },
   {
     name: 'Services',
     icon: require('../../assets/services.png'),
+    component: PrivacyScreen,
+  },
+  {
+    name: 'Todo',
+    icon: require('../../assets/todo.png'),
     component: AlertScreen,
   },
 ] as const;
@@ -51,7 +60,13 @@ const Tab = createBottomTabNavigator();
 
 export default function HomeScreen() {
   const { getIconForRoute } = useHomeController();
+  // console.log(
+  //   .getParent('RootStack')?.getState().routeNames
+  // );
+  
+  
 
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <Tab.Navigator
