@@ -31,11 +31,6 @@ const TABS = [
     icon: require('../../assets/services.png'),
     component: PrivacyScreen,
   },
-  {
-    name: 'Todo',
-    icon: require('../../assets/todo.png'),
-    component: AlertScreen,
-  },
 ] as const;
 
 /* =========================

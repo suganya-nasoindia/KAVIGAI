@@ -13,11 +13,6 @@ export async function fetchTodos(
   params: FetchTodoParams
 ): Promise<Todo[]> {
 
-  const headers = {
-    'X-Access-Token': params.accessToken,
-    'X-Api-Key': params.apiKey,
-  };
-
   const body = {
     data: JSON.stringify({
       info: {
@@ -31,13 +26,20 @@ export async function fetchTodos(
     }),
   };
 
-  const response = await POSTMethod(API_ENDPOINTS.END_POINT_GET_TODO_HANDLER, body, headers);
-
-  if (response?.status?.statusCode !== 200) {
-    throw new Error('Failed to fetch todos');
+  const response = await POSTMethod(API_ENDPOINTS.END_POINT_GET_TODO_HANDLER, body);
+  console.log('Fetch Todos Response:', response);
+  if (response?.data?.status?.statusCode !== 200) {
+    throw new Error(response?.data?.status?.message || 'Failed to fetch todos');
   }
 
-  return response.data.content.map((item: any) => ({
+  //const todos = response?.data?.data?.content?.todo ?? [];
+
+  const todos = Array.isArray(response?.data?.data?.content)
+    ? response.data.data.content
+    : [];
+  console.log('Parsed Todos:', todos);
+
+  return todos.map((item: any) => ({
     ...item,
     dateInterval: Utilities.calculateDateInterval(
       Utilities.getCurrentDateAndTimeInUTC(),

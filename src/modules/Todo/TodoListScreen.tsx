@@ -1,64 +1,224 @@
-import React, { useState } from 'react';
+/* eslint-disable react/no-unstable-nested-components */
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
-  Text,
+  Text, TouchableOpacity,
   ActivityIndicator,
-  SafeAreaView,
+  StyleSheet,
   Dimensions,
-  TouchableOpacity,
 } from 'react-native';
-import { RecyclerListView, DataProvider, LayoutProvider } from 'recyclerlistview';
-import ButtonComponent from '../../components/ButtonComponent';
-import { useTodoController } from './useTodoController';
+
+import {
+  RecyclerListView,
+  DataProvider,
+  LayoutProvider,
+} from 'recyclerlistview';
+
+import { useTodoController, FilterType } from './useTodoController';
 import { Todo } from './TodoModel';
+import ButtonComponent from '../../Components/ButtonComponent';
 
 const { width } = Dimensions.get('window');
 
-const TodoScreen: React.FC<any> = ({ navigation }) => {
-  const { loading, error, todos, filter, setFilter } = useTodoController();
+const TodoScreen = () => {
+  // const { todos, loading, error, filter, reload } = useTodoController();
+  const { todos, loading, error, filter, reload, setFilter } = useTodoController();
 
-  const [itemHeights, setItemHeights] = useState<Record<number, number>>({});
+  console.log('Active filter:', filter);
+  console.log('Todos received:', todos.length);
+  console.log('todos length:', todos.length);
+  console.log('all todos:', todos);
 
-  const dataProvider = new DataProvider(
-    (r1: Todo, r2: Todo) => r1.todoID !== r2.todoID
-  ).cloneWithRows(todos);
-
-  const layoutProvider = new LayoutProvider(
-    index => index,
-    (type, dim) => {
-      dim.width = width;
-      dim.height = itemHeights[type] || 110;
-    }
+  /* ---------------- DATA PROVIDER ---------------- */
+  const [dataProvider, setDataProvider] = useState(
+    new DataProvider((r1, r2) => r1 !== r2)
   );
 
-  if (loading) return <ActivityIndicator size="large" />;
-  if (error) return <Text>{error}</Text>;
+  const counts = useMemo(() => {
+    return {
+      current: todos.filter(t => t.dateInterval === 0).length,
+      skipped: todos.filter(t => t.dateInterval < 0).length,
+      future: todos.filter(t => t.dateInterval > 0).length,
+    };
+  }, [todos]);
 
+  useEffect(() => {
+    setDataProvider(prev =>
+      prev.cloneWithRows(Array.isArray(todos) ? todos : [])
+    );
+  }, [todos]);
+
+  useEffect(() => {
+    if (todos.length === 0) {
+      reload();   // force reload
+    }
+  }, [])
+
+
+  /* ---------------- LAYOUT PROVIDER ---------------- */
+  const layoutProvider = useMemo(
+    () =>
+      new LayoutProvider(
+        () => 'ROW',
+        (_, dim) => {
+          dim.width = width;
+          dim.height = 120;
+        }
+      ),
+    []
+  );
+
+  /* ---------------- ROW RENDERER ---------------- */
+  const rowRenderer = (_: string, item: Todo) => {
+    const hasGoal =
+      Boolean(item.goalID) ||
+      (Array.isArray(item.goals) && item.goals.length > 0);
+
+    return hasGoal ? (
+      <GoalTodoItem item={item} />
+    ) : (
+      <NormalTodoItem item={item} />
+    );
+  };
+
+  /* ---------------- UI STATES ---------------- */
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text>{error}</Text>
+      </View>
+    );
+  }
+
+  /* ---------------- MAIN UI ---------------- */
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={styles.container}>
+      {/* 🔘 FILTER BUTTONS */}
       <ButtonComponent
         selectedFilter={filter}
         onPressCurrent={() => setFilter('current')}
         onPressSkipped={() => setFilter('skipped')}
         onPressPending={() => setFilter('future')}
-        hideHeader
-      />
 
-      <RecyclerListView
-        layoutProvider={layoutProvider}
-        dataProvider={dataProvider}
-        rowRenderer={(type, item: Todo) => (
-          <View>
-            <Text>{item.name}</Text>
-          </View>
-        )}
+        currentCount={counts.current}
+        skippedCount={counts.skipped}
+        pendingCount={counts.future}
+        hideHeader={true}
       />
-
-      <TouchableOpacity onPress={() => navigation.navigate('AddGoal')}>
-        <Text>＋</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+      {dataProvider.getSize() === 0 ? (
+        <View style={styles.center}>
+          <Text>No todos available.</Text>
+        </View>) : (
+        <RecyclerListView
+          dataProvider={dataProvider}
+          layoutProvider={layoutProvider}
+          rowRenderer={rowRenderer}
+        />
+      )}
+    </View>
   );
 };
 
 export default TodoScreen;
+
+/* ================================================= */
+/* ================= ROW COMPONENTS ================= */
+/* ================================================= */
+
+const GoalTodoItem = ({ item }: { item: Todo }) => (
+  <View style={[styles.card, styles.goalCard]}>
+    <Text style={styles.title}>{item.name}</Text>
+
+    <Text style={styles.description} numberOfLines={2}>
+      {item.description}
+    </Text>
+
+    <Text style={styles.goalText}>
+      🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
+    </Text>
+  </View>
+);
+
+const NormalTodoItem = ({ item }: { item: Todo }) => (
+  <View style={styles.card}>
+    <Text style={styles.title}>{item.name}</Text>
+
+    <Text style={styles.description} numberOfLines={2}>
+      {item.description}
+    </Text>
+  </View>
+);
+
+/* ================================================= */
+/* ===================== STYLES ==================== */
+/* ================================================= */
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFE8C7',
+  },
+  filterBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  filterBtnActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#36a2eb',
+  },
+  filterText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  filterTextActive: {
+    color: '#36a2eb',
+    fontWeight: '600',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  card: {
+    backgroundColor: '#fff',
+    marginHorizontal: 10,
+    marginVertical: 6,
+    padding: 12,
+    borderRadius: 10,
+    elevation: 2,
+  },
+
+  goalCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#36a2eb',
+  },
+
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  description: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 4,
+  },
+
+  goalText: {
+    marginTop: 6,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#36a2eb',
+  },
+});

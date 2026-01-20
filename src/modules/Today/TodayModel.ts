@@ -1,6 +1,38 @@
 // Today.model.ts
 
+
 export type GoalStatus = 'CURRENT' | 'SKIPPED' | 'FUTURE';
+
+export interface GoalSummaryItem {
+  status: GoalStatus;
+  count: number;
+}
+
+export interface StatsItem {
+  type: 'GOAL' | string;
+  summary: GoalSummaryItem[];
+}
+
+export interface TodayContent {
+  today: TodayItem[];
+  stats: StatsItem[];
+}
+
+export interface TodayApiData {
+  content: TodayContent;
+}
+
+export interface TodayApiResponse {
+  status: {
+    statusCode: number;
+    message: string;
+  };
+  data: {
+    data: TodayApiData;
+  };
+}
+
+
 
 export interface TodayItem {
   goalID?: number;

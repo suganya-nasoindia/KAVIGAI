@@ -9,6 +9,7 @@ import SuggestedServicesView from '../modules/SuggestedServices/SuggestedService
 import { TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { primaryHeaderOptions } from '../themes/navigation';
 import TodayScreen from '../modules/Today/TodayView';
+import TodoScreen from '../modules/Todo/TodoListScreen';
 
 
 
@@ -76,8 +77,13 @@ export default function AppStack() {
                 ...primaryHeaderOptions,
             }} />
                  <Stack.Screen name="Today" component={TodayScreen} options={{
-                headerShown: true,
-                title: 'Alert Details',
+                headerShown: false,
+                title: 'Today',
+                ...primaryHeaderOptions,
+            }} />
+             <Stack.Screen name="Todo" component={TodoScreen} options={{
+                headerShown: false,
+                title: 'Todo',
                 ...primaryHeaderOptions,
             }} />
         </Stack.Navigator>
