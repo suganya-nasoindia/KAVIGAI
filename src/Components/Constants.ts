@@ -146,6 +146,13 @@ const Constants = {
     SEARCH_UC: 'FINDMENTOR',
     GOAL_UC: 'GOAL',
 
+
+    // todo:'TODO',
+    // event:'EVENT',
+    // book:'BOOK',
+    // meeting:'MEETING',
+    // website:'WEBSITE',
+    // goal:'GOAL',
     MENTOR_UC: 'MENTOR',
     MENTEE_UC: 'MENTEE',
 

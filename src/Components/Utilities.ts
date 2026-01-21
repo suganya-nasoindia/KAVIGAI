@@ -3,7 +3,7 @@ import { PermissionsAndroid } from "react-native";
 import { parse, format } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-class Utilities {
+class Utilities {                                                                                                                    
   /** Get current date + time in UTC (ISO format) */
   static getCurrentDateAndTimeInUTC(): string {
     return new Date().toISOString();

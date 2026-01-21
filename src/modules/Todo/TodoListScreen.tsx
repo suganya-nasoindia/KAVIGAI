@@ -14,16 +14,24 @@ import {
   LayoutProvider,
 } from 'recyclerlistview';
 
+
 import { useTodoController, FilterType } from './useTodoController';
 import { Todo } from './TodoModel';
 import ButtonComponent from '../../Components/ButtonComponent';
 
 const { width } = Dimensions.get('window');
 
+
 const TodoScreen = () => {
   // const { todos, loading, error, filter, reload } = useTodoController();
   const { todos, loading, error, filter, reload, setFilter } = useTodoController();
 
+  const ViewTypes = {
+    NORMAL: 'NORMAL',
+    GOAL: 'GOAL',
+  };
+
+  
   console.log('Active filter:', filter);
   console.log('Todos received:', todos.length);
   console.log('todos length:', todos.length);
@@ -59,14 +67,32 @@ const TodoScreen = () => {
   const layoutProvider = useMemo(
     () =>
       new LayoutProvider(
-        () => 'ROW',
-        (_, dim) => {
+        (index) => {
+          const item = dataProvider.getDataForIndex(index) as Todo;
+          const hasGoal =
+            Boolean(item.goalID) ||
+            (Array.isArray(item.goals) && item.goals.length > 0);
+  
+          return hasGoal ? ViewTypes.GOAL : ViewTypes.NORMAL;
+        },
+        (type, dim,index) => {
+          const item = dataProvider.getDataForIndex(index) as Todo;
           dim.width = width;
-          dim.height = 120;
+          dim.height = calculateRowHeight(item);
+
+          // switch (type) {
+          //   case ViewTypes.GOAL:
+          //     dim.height = 120;   // taller
+          //     break;
+          //   case ViewTypes.NORMAL:
+          //   default:
+          //     dim.height = 85;    // shorter
+          // }
         }
       ),
-    []
+    [dataProvider]
   );
+  
 
   /* ---------------- ROW RENDERER ---------------- */
   const rowRenderer = (_: string, item: Todo) => {
@@ -80,6 +106,30 @@ const TodoScreen = () => {
       <NormalTodoItem item={item} />
     );
   };
+
+
+
+  const LINE_HEIGHT = 15;
+  const BASE_PADDING = 25;
+  
+  const calculateRowHeight = (item: Todo) => {
+    const titleLines = Math.ceil((item.name?.length ?? 0) / 25);
+    const descLines = Math.ceil((item.description?.length ?? 0) / 45);
+  
+    let height =
+      BASE_PADDING +
+      titleLines * LINE_HEIGHT +
+      descLines * LINE_HEIGHT;
+  
+    // extra height if goal exists
+    if (item.goalID || (item.goals && item.goals.length > 0)) {
+      height += 40;
+    }
+  
+    return Math.max(height, 80); // minimum height
+  };
+  
+
 
   /* ---------------- UI STATES ---------------- */
   if (loading) {
@@ -166,24 +216,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFE8C7',
   },
-  filterBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  filterBtnActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#36a2eb',
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  filterTextActive: {
-    color: '#36a2eb',
-    fontWeight: '600',
-  },
+
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -193,8 +226,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     marginHorizontal: 10,
-    marginVertical: 6,
-    padding: 12,
+    marginVertical: 3,
+    padding: 10,
     borderRadius: 10,
     elevation: 2,
   },
@@ -205,20 +238,23 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
 
   description: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#666',
     marginTop: 4,
   },
 
   goalText: {
     marginTop: 6,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#36a2eb',
+    color: '#646464',
   },
 });
+
+
+
