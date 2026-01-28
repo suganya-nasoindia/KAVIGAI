@@ -17,7 +17,7 @@ function HomeButton() {
   const navigation = useNavigation();
 
   const goToHome = () => {
-    navigation.getParent()?.dispatch(
+    navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [

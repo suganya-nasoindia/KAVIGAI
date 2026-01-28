@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux';
 import { DataProvider } from 'recyclerlistview';
 import Utilities from '../../Components/Utilities';
 import { POSTMethod } from "../../services/api/ApiClient";
+import API_ENDPOINTS from '../../services/api/endpoints';
 
 import { PieChartItem, TodayItem, TodayApiData } from './TodayModel';
-import API_ENDPOINTS from '../../services/api/endpoints';
 
 export const useTodayController = () => {
   const [dataProvider, setDataProvider] = useState(

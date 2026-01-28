@@ -151,6 +151,7 @@ export const useLoginController = (navigation: any) => {
       dispatch(setServices(userPayload.services.map((service: any) => ({
         serviceID: service.serviceID,
         serviceName: service.serviceName,
+        serviceType:service.serviceType,
         description: service.description,
         isActive: Boolean(service.status), // 🔥 THIS LINE
       }))

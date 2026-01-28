@@ -10,7 +10,8 @@ import { TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { primaryHeaderOptions } from '../themes/navigation';
 import TodayScreen from '../modules/Today/TodayView';
 import TodoScreen from '../modules/Todo/TodoListScreen';
-
+import ServicesHomeScreen from '../modules/ServicesHome/ServicesHomeScreen';
+import EventList from '../modules/Events/EventList';
 
 
 const Stack = createNativeStackNavigator();
@@ -76,14 +77,28 @@ export default function AppStack() {
                 title: 'Alert Details',
                 ...primaryHeaderOptions,
             }} />
-                 <Stack.Screen name="Today" component={TodayScreen} options={{
+            <Stack.Screen
+                name="EventList"
+                component={EventList}
+                options={{  headerShown: false,
+                    title: 'Events',
+                    ...primaryHeaderOptions,
+                 }}
+            />
+
+            <Stack.Screen name="Today" component={TodayScreen} options={{
                 headerShown: false,
                 title: 'Today',
                 ...primaryHeaderOptions,
             }} />
-             <Stack.Screen name="Todo" component={TodoScreen} options={{
+            <Stack.Screen name="Todo" component={TodoScreen} options={{
                 headerShown: false,
                 title: 'Todo',
+                ...primaryHeaderOptions,
+            }} />
+            <Stack.Screen name="Services" component={ServicesHomeScreen} options={{
+                headerShown: false,
+                title: 'Services',
                 ...primaryHeaderOptions,
             }} />
         </Stack.Navigator>

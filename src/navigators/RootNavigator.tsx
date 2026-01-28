@@ -8,56 +8,48 @@ import AuthStack from './AuthStack';
 import AppStack from './AppStack';
 import { RootState } from '../redux/reactstore';
 
-const RootStack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function RootNavigator() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState(false);
 
   const isLoggedIn = useSelector(
     (state: RootState) => state.auth.isLoggedIn
   );
 
   useEffect(() => {
-    const initApp = async () => {
+    const bootstrap = async () => {
       try {
-        const firstTimeValue = await AsyncStorage.getItem('isFirstTime');
+        const value = await AsyncStorage.getItem('isFirstTime');
 
-        // if key doesn't exist → first time user
-        if (firstTimeValue === null) {
-          setIsFirstTime(true);
+        if (value === null) {
           await AsyncStorage.setItem('isFirstTime', 'false');
-        } else {
-          setIsFirstTime(false);
+          setIsFirstTime(true);
         }
       } catch (e) {
-        setIsFirstTime(false);
+        console.log('Init error', e);
       } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 2000); // splash duration
+        setIsReady(true);
       }
     };
 
-    initApp();
+    bootstrap();
   }, []);
 
-  // ⛔ wait until async storage is resolved
-  if (isLoading || isFirstTime === null) {
-    return (
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        <RootStack.Screen name="Splash" component={SplashScreen} />
-      </RootStack.Navigator>
-    );
-  }
+
 
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {isFirstTime ? (
-        <RootStack.Screen name="AuthStack" component={AuthStack} />
-      ) : (
-        <RootStack.Screen name="AppStack" component={AppStack} />
-      )}
-    </RootStack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    {!isReady && (
+      <Stack.Screen name="Splash" component={SplashScreen} />
+    )}
+
+    {isLoggedIn ? (
+      <Stack.Screen name="AppStack" component={AppStack} />
+    ) : (
+      <Stack.Screen name="AuthStack" component={AuthStack} />
+    )}
+  </Stack.Navigator>
   );
 }
