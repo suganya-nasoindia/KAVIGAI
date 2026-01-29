@@ -3,6 +3,7 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import userProfileReducer from './slices/userProfileSlice';
 import  authReducer  from './slices/authslice';
+import serviceReducer from './slices/serviceSlice';
 
 // ----------------------------------------
 // ROOT REDUCER
@@ -10,6 +11,8 @@ import  authReducer  from './slices/authslice';
 const rootReducer = combineReducers({
   auth: authReducer,
   userProfile: userProfileReducer,
+  service: serviceReducer, // 👈 REQUIRED
+
 });
 
 // ----------------------------------------

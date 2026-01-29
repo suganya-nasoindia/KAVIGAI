@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { normalizeService } from '../utils/serviceNormalizer';
 
 /* ---------------- TYPES ---------------- */
 
@@ -28,9 +29,23 @@ type MentorInfo = {
 type Service = {
   serviceID: number;
   serviceName?: string;
+  serviceType?:string;
   description?: string;
   isActive: boolean; // 👈 REQUIRED
 };
+
+// type Service = {
+//   serialNo: number;
+//   serviceID: number;
+//   serviceName: string;
+//   serviceType: string;
+//   description: string;
+
+//   menuStatus: boolean;
+//   status: boolean;
+
+//   userID: number;
+// }
 
 type UserProfileState = {
   /* BASIC PROFILE (UNCHANGED) */
@@ -209,6 +224,11 @@ const userProfileSlice = createSlice({
     setServices(state, action: PayloadAction<Service[]>) {
       state.services = action.payload;
     },
+
+    
+// setServices(state, action: PayloadAction<any[]>) {
+//   state.services = action.payload.map(normalizeService);
+// },
 
     /* ---------------- CURRENT GOALS ---------------- */
     setCurrentGoals(state, action: PayloadAction<any[]>) {
