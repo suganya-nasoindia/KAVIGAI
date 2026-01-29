@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import Utilities from '../../Components/Utilities';
 import { POSTMethod } from '../../services/api/ApiClient';
 import API_ENDPOINTS from '../../services/api/endpoints';
-import { EventItem, FilterType } from './EventModel';
+import { WebsiteItem, FilterType } from './WebsiteModel';
 
 const { width } = Dimensions.get('window');
 
@@ -15,12 +15,12 @@ const ViewTypes = {
   GOAL: 'GOAL',
 };
 
-export const useEventListController = () => {
+export const useWebsiteListController = () => {
   const { apiKey, accessToken, loginName } = useSelector(
     (state: any) => state.auth
   );
 
-  const [allData, setAllData] = useState<EventItem[]>([]);
+  const [allData, setAllData] = useState<WebsiteItem[]>([]);
   const [filterType, setFilterType] = useState<FilterType>('current');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -31,7 +31,7 @@ export const useEventListController = () => {
   );
 
   /* ---------------- API ---------------- */
-  const getEventList = async () => {
+  const getWebsiteList = async () => {
     try {
       const headers = {
         'X-Access-Token': accessToken,
@@ -53,7 +53,7 @@ export const useEventListController = () => {
       };
 
       const response = await POSTMethod(
-        API_ENDPOINTS.END_POINT_GET_EVENT_HANDLER,
+        API_ENDPOINTS.END_POINT_GET_WEBSITES_HANDLER,
         body,
         headers
       );
@@ -63,7 +63,7 @@ export const useEventListController = () => {
         return;
       }
 
-      const content: EventItem[] =
+      const content: WebsiteItem[] =
         response.data.data?.content ?? [];
 
       const updated = content.map(item => ({
@@ -86,7 +86,7 @@ export const useEventListController = () => {
   /* ---------------- FILTER ---------------- */
   const applyFilter = useCallback(
     (type: FilterType) => {
-      let filtered: EventItem[] = [];
+      let filtered: WebsiteItem[] = [];
 
       switch (type) {
         case 'current':
@@ -106,7 +106,7 @@ export const useEventListController = () => {
   );
 
   useEffect(() => {
-    getEventList();
+    getWebsiteList();
   }, []);
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export const useEventListController = () => {
   }, [filterType, allData]);
 
   /* ---------------- HEIGHT CALC ---------------- */
-  const calculateRowHeight = (item: EventItem) => {
+  const calculateRowHeight = (item: WebsiteItem) => {
     const LINE_HEIGHT = 16;
     const BASE_PADDING = 70;
 
@@ -138,7 +138,7 @@ export const useEventListController = () => {
     () =>
       new LayoutProvider(
         index => {
-          const item = dataProvider.getDataForIndex(index) as EventItem;
+          const item = dataProvider.getDataForIndex(index) as WebsiteItem;
 
           const hasGoal =
             Boolean(item.goalID) ||
@@ -147,7 +147,7 @@ export const useEventListController = () => {
           return hasGoal ? ViewTypes.GOAL : ViewTypes.NORMAL;
         },
         (_type, dim, index) => {
-          const item = dataProvider.getDataForIndex(index) as EventItem;
+          const item = dataProvider.getDataForIndex(index) as WebsiteItem;
           dim.width = width;
           dim.height = calculateRowHeight(item);
         }

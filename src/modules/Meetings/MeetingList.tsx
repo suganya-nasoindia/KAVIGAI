@@ -12,18 +12,18 @@ import { RecyclerListView } from 'recyclerlistview';
 import { RootState } from '../../redux/reactstore';
 import { useSelector } from 'react-redux';
 import ButtonComponent from '../../Components/ButtonComponent';
-import { useEventListController } from './EventsController';
-import { EventItem } from './EventModel';
+import { useMeetingListController } from './MeetingController';
+import { MeetingItem } from './MeetingModel';
 
 /* ---------------- SHARED CONTENT ----------------*/
 
-const EventContent = ({ item }: { item: EventItem }) => (
+const MeetingContent = ({ item }: { item: MeetingItem }) => (
   <View style={styles.row}>
     <Image
       source={
         item.imageUrl
           ? { uri: item.imageUrl.replace(/\s/g, '%20') }
-          : require('../../assets/events.png')
+          : require('../../assets/meeting.png')
       }
       style={styles.icon}
     />
@@ -46,12 +46,12 @@ const EventContent = ({ item }: { item: EventItem }) => (
 
 /* ---------------- ROW TYPES ---------------- */
 
-const GoalEventItem = ({ item, navigation }: any) => (
+const GoalMeetingItem = ({ item, navigation }: any) => (
   <TouchableOpacity
-    onPress={() => navigation.navigate('EventDetails', { event: item })}
+    onPress={() => navigation.navigate('MeetingDetails', { event: item })}
   >
     <View style={[styles.card, styles.goalCard]}>
-      <EventContent item={item} />
+      <MeetingContent item={item} />
       <Text style={styles.goalText}>
         🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
       </Text>
@@ -59,22 +59,23 @@ const GoalEventItem = ({ item, navigation }: any) => (
   </TouchableOpacity>
 );
 
-const NormalEventItem = ({ item, navigation }: any) => (
+const NormalMeetingItem = ({ item, navigation }: any) => (
   <TouchableOpacity
-    onPress={() => navigation.navigate('EventDetails', { event: item })}
+    onPress={() => navigation.navigate('MeetingDetails', { event: item })}
   >
     <View style={styles.card}>
-      <EventContent item={item} />
+      <MeetingContent item={item} />
     </View>
   </TouchableOpacity>
 );
 
 /* ---------------- MAIN SCREEN ---------------- */
 
-const EventList = ({ navigation }: any) => {
-  const selectedService = useSelector(
-    (state: RootState) => state.service.selectedService
-);
+const MeetingList = ({ navigation }: any) => {
+    const selectedService = useSelector(
+        (state: RootState) => state.service.selectedService
+    );
+
   const {
     loading,
     error,
@@ -82,14 +83,14 @@ const EventList = ({ navigation }: any) => {
     setFilterType,
     dataProvider,
     layoutProvider,
-  } = useEventListController();
+  } = useMeetingListController();
 
   if (loading) {
     return <ActivityIndicator style={{ flex: 1 }} size="large" />;
   }
 
   if (error) {
-    return <Text>Error loading events</Text>;
+    return <Text>Error loading Meeting List</Text>;
   }
 
   return (
@@ -99,26 +100,26 @@ const EventList = ({ navigation }: any) => {
         onPressSkipped={() => setFilterType('skipped')}
         onPressPending={() => setFilterType('future')}
         selectedFilter={filterType}
-        serviceName={selectedService ?? 'EVENT'} // 🔥 dynamic
+        serviceName={selectedService ?? 'MEETING'} // 🔥 dynamic
         />
 
       {dataProvider.getSize() === 0 ? (
         <View style={styles.center}>
-          <Text>No events available</Text>
+          <Text>No Meetings available</Text>
         </View>
       ) : (
         <RecyclerListView
           dataProvider={dataProvider}
           layoutProvider={layoutProvider}
-          rowRenderer={(_, item: EventItem) => {
+          rowRenderer={(_, item: MeetingItem) => {
             const hasGoal =
               Boolean(item.goalID) ||
               (Array.isArray(item.goals) && item.goals.length > 0);
 
             return hasGoal ? (
-              <GoalEventItem item={item} navigation={navigation} />
+              <GoalMeetingItem item={item} navigation={navigation} />
             ) : (
-              <NormalEventItem item={item} navigation={navigation} />
+              <NormalMeetingItem item={item} navigation={navigation} />
             );
           }}
         />
@@ -126,7 +127,7 @@ const EventList = ({ navigation }: any) => {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate('AddEvent')}
+        onPress={() => navigation.navigate('AddMeeting')}
       >
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
@@ -134,7 +135,7 @@ const EventList = ({ navigation }: any) => {
   );
 };
 
-export default EventList;
+export default MeetingList;
 
 /* ---------------- STYLES ---------------- */
 

@@ -1,6 +1,6 @@
 export type FilterType = 'current' | 'skipped' | 'future';
 
-export interface EventItem {
+export interface MeetingItem {
   id: string;
   name: string;
   description: string;

@@ -38,7 +38,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = ({
   pendingCount,
 
   hideHeader = false,
-  serviceName,
+  serviceName,                           
 }) => {
   /* ---------- Icon resolver ---------- */
   const getServiceIcon = (name?: string): ImageSourcePropType => {

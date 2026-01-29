@@ -1,6 +1,6 @@
 export type FilterType = 'current' | 'skipped' | 'future';
 
-export interface EventItem {
+export interface BookItem {
   id: string;
   name: string;
   description: string;
@@ -17,6 +17,5 @@ export interface EventItem {
     goalStatus: boolean;
     connectedStatus: boolean;
   }[];
-
   dateInterval?: number;
 }

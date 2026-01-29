@@ -1,4 +1,7 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { setSelectedService } from '../../redux/slices/serviceSlice';
+
 import {
   SafeAreaView,
   Image,
@@ -18,7 +21,8 @@ const { height } = Dimensions.get('window');
 
 const ServicesHomeScreen: React.FC<Props> = ({ navigation }) => {
   const { services, getServiceIcon } = useServicesController();
- 
+  const dispatch = useDispatch();
+
 
   const navigateToService = (type: string) => {
     console.log('Navigating to service:', type);
@@ -74,8 +78,10 @@ const ServicesHomeScreen: React.FC<Props> = ({ navigation }) => {
            return(
              <TouchableOpacity
               style={styles.card}
-           
-              onPress={() => navigateToService(item.serviceType)}
+              onPress={() => {
+                dispatch(setSelectedService(item.serviceType)); // 🔥
+                navigateToService(item.serviceType);
+              }}
             >
 
               <Image

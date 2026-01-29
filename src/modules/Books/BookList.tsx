@@ -1,4 +1,6 @@
 import React from 'react';
+import { RootState } from '../../redux/reactstore';
+import { useSelector } from 'react-redux';
 import {
   View,
   Text,
@@ -9,21 +11,20 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { RecyclerListView } from 'recyclerlistview';
-import { RootState } from '../../redux/reactstore';
-import { useSelector } from 'react-redux';
+
 import ButtonComponent from '../../Components/ButtonComponent';
-import { useEventListController } from './EventsController';
-import { EventItem } from './EventModel';
+import { useBookListController } from './BooksController';
+import { BookItem } from './BookModel';
 
 /* ---------------- SHARED CONTENT ----------------*/
 
-const EventContent = ({ item }: { item: EventItem }) => (
+const BookContent = ({ item }: { item: BookItem }) => (
   <View style={styles.row}>
     <Image
       source={
         item.imageUrl
           ? { uri: item.imageUrl.replace(/\s/g, '%20') }
-          : require('../../assets/events.png')
+          : require('../../assets/book.png')
       }
       style={styles.icon}
     />
@@ -46,12 +47,12 @@ const EventContent = ({ item }: { item: EventItem }) => (
 
 /* ---------------- ROW TYPES ---------------- */
 
-const GoalEventItem = ({ item, navigation }: any) => (
+const GoalBookItem = ({ item, navigation }: any) => (
   <TouchableOpacity
-    onPress={() => navigation.navigate('EventDetails', { event: item })}
+    onPress={() => navigation.navigate('BookDetails', { event: item })}
   >
     <View style={[styles.card, styles.goalCard]}>
-      <EventContent item={item} />
+      <BookContent item={item} />
       <Text style={styles.goalText}>
         🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
       </Text>
@@ -59,22 +60,22 @@ const GoalEventItem = ({ item, navigation }: any) => (
   </TouchableOpacity>
 );
 
-const NormalEventItem = ({ item, navigation }: any) => (
+const NormalBookItem = ({ item, navigation }: any) => (
   <TouchableOpacity
-    onPress={() => navigation.navigate('EventDetails', { event: item })}
+    onPress={() => navigation.navigate('BookDetails', { event: item })}
   >
     <View style={styles.card}>
-      <EventContent item={item} />
+      <BookContent item={item} />
     </View>
   </TouchableOpacity>
 );
 
 /* ---------------- MAIN SCREEN ---------------- */
 
-const EventList = ({ navigation }: any) => {
-  const selectedService = useSelector(
-    (state: RootState) => state.service.selectedService
-);
+const BookList = ({ navigation }: any) => {
+    const selectedService = useSelector(
+        (state: RootState) => state.service.selectedService
+    );
   const {
     loading,
     error,
@@ -82,14 +83,14 @@ const EventList = ({ navigation }: any) => {
     setFilterType,
     dataProvider,
     layoutProvider,
-  } = useEventListController();
+  } = useBookListController();
 
   if (loading) {
     return <ActivityIndicator style={{ flex: 1 }} size="large" />;
   }
 
   if (error) {
-    return <Text>Error loading events</Text>;
+    return <Text>Error loading Books</Text>;
   }
 
   return (
@@ -99,26 +100,26 @@ const EventList = ({ navigation }: any) => {
         onPressSkipped={() => setFilterType('skipped')}
         onPressPending={() => setFilterType('future')}
         selectedFilter={filterType}
-        serviceName={selectedService ?? 'EVENT'} // 🔥 dynamic
+        serviceName={selectedService ?? 'BOOK'} // 🔥 dynamic
         />
 
       {dataProvider.getSize() === 0 ? (
         <View style={styles.center}>
-          <Text>No events available</Text>
+          <Text>No Books available</Text>
         </View>
       ) : (
         <RecyclerListView
           dataProvider={dataProvider}
           layoutProvider={layoutProvider}
-          rowRenderer={(_, item: EventItem) => {
+          rowRenderer={(_, item: BookItem) => {
             const hasGoal =
               Boolean(item.goalID) ||
               (Array.isArray(item.goals) && item.goals.length > 0);
 
             return hasGoal ? (
-              <GoalEventItem item={item} navigation={navigation} />
+              <GoalBookItem item={item} navigation={navigation} />
             ) : (
-              <NormalEventItem item={item} navigation={navigation} />
+              <NormalBookItem item={item} navigation={navigation} />
             );
           }}
         />
@@ -126,7 +127,7 @@ const EventList = ({ navigation }: any) => {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => navigation.navigate('AddEvent')}
+        onPress={() => navigation.navigate('AddBook')}
       >
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
@@ -134,7 +135,7 @@ const EventList = ({ navigation }: any) => {
   );
 };
 
-export default EventList;
+export default BookList;
 
 /* ---------------- STYLES ---------------- */
 

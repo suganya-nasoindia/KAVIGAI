@@ -3,8 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import ServicesHomeScreen from './ServicesHomeScreen';
 import EventList from '../../modules/Events/EventList';
-// import BookList from '../../modules/books/BookList';
-// import MeetingList from '../screens/meetings/MeetingList';
+import BookList from '../../modules/Books/BookList';
+import MeetingList from '../../modules/Meetings/MeetingList';
+import WebsiteList from '../../modules/Websites/WebsiteList';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,14 +20,18 @@ const ServicesStackNavigator = () => {
         name="EventList"
         component={EventList}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="BookList"
         component={BookList}
       />
       <Stack.Screen
         name="MeetingList"
         component={MeetingList}
-      /> */}
+      />
+         <Stack.Screen
+        name="WebsiteList"
+        component={WebsiteList}
+      />
     </Stack.Navigator>
   );
 };
