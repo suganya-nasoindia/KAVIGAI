@@ -2,9 +2,11 @@ import Geolocation from "react-native-geolocation-service";
 import { PermissionsAndroid } from "react-native";
 import { parse, format } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RootState } from '../redux/reactstore';
 
 class Utilities {                                                                                                                    
   /** Get current date + time in UTC (ISO format) */
+
   static getCurrentDateAndTimeInUTC(): string {
     return new Date().toISOString();
   }
@@ -133,6 +135,55 @@ class Utilities {
     }
   }
 
+
+  static  saveGoalsByDateInterval = async (
+    state: RootState
+  ) => {
+    const CURRENT_GOALS_KEY = 'USER_CURRENT_GOALS';
+
+    try {
+      const goals = state.userProfileSlice?.goals ?? [];
+  
+      const todayGoals: any[] = [];
+      const upcomingGoals: any[] = [];
+  
+      goals.forEach(goal => {
+        if (!goal.goalEndDate || goal.archived) return;
+  
+        const dateInterval = Utilities.calculateDateInterval(Utilities.getCurrentDateAndTimeInUTC(),goal.goalStartDate,
+          goal.goalEndDate
+        );
+  
+        const enrichedGoal = {
+          ...goal,
+          dateInterval,
+        };
+  
+        if (dateInterval === 0) {
+          todayGoals.push(enrichedGoal);
+        }
+  
+        if (dateInterval > 0) {
+          upcomingGoals.push(enrichedGoal);
+        }
+      });
+  
+      const payload = {
+        today: todayGoals,
+        upcoming: upcomingGoals,
+        lastUpdated: new Date().toISOString(),
+      };
+  
+      await AsyncStorage.setItem(
+        CURRENT_GOALS_KEY,
+        JSON.stringify(payload)
+      );
+  
+      console.log('✅ Goals saved successfully', payload);
+    } catch (error) {
+      console.error('❌ Error saving goals', error);
+    }
+  };
   /** Get server API URL or fallback to default config */
 //   static async getServerAPI(endpoint?: string): Promise<string | null> {
 //     try {

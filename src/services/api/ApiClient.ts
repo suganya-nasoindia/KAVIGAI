@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export interface ApiResponse<T = any> {
   success: boolean;
   statusCode: number;
-  data?: T ;
+  data?: T;
   error?: string;
 }
 
@@ -18,7 +18,15 @@ const BASE_URL = "https://api.kavigai.com/api/v1/index.php/";
  *  GET TOKEN & APIKEY FROM STORAGE
 -------------------------------------*/
 const getAuthHeaders = async () => {
-  const token = await AsyncStorage.getItem("AUTH_TOKEN");
+  const storedAuth = await AsyncStorage.getItem("AUTH_DATA");
+  let authData = null;
+  if (storedAuth) {
+     authData = JSON.parse(storedAuth);
+
+    console.log("LOGIN SUCCESSFUL", authData);
+    console.log("Auth Token:", authData.accessToken);
+  }
+  const token = authData.accessToken;
 
   if (!token) return {};
 
@@ -35,6 +43,8 @@ export const POSTMethod = async <T>(
   body: any,
   customHeaders: HeadersType = {}
 ): Promise<ApiResponse<T>> => {
+  console.log("POSTMethod called with endpoint:", endpoint);
+  console.log("Request body:", body);
   try {
     const authHeaders = await getAuthHeaders();
 

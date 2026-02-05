@@ -1,7 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { Alert, Dimensions } from 'react-native';
 import { DataProvider, LayoutProvider } from 'recyclerlistview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 import Utilities from '../../Components/Utilities';
 import { POSTMethod } from '../../services/api/ApiClient';
@@ -32,7 +38,7 @@ export const useAlertController = () => {
     []
   );
 
-  /* Load auth */
+  /* 🔹 Load auth ONCE */
   useEffect(() => {
     const loadAuth = async () => {
       const name = await AsyncStorage.getItem('LOGIN_NAME');
@@ -45,51 +51,79 @@ export const useAlertController = () => {
     loadAuth();
   }, []);
 
-  /* Fetch alerts */
-  useEffect(() => {
-    if (!loginName || !apiKey) return;
-
-    const fetchAlerts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const payload = {
-          info: {
-            actionType: 'showall',
-            platformType: 'android',
-            type: 'android',
-            outputType: 'json',
-            currentDateTime: Utilities.getCurrentDateAndTimeInUTC(),
-            currentTimezone: Utilities.getCurrentTimeZone(),
-          },
-          data: {
-            content: { apiKey, loginName, }
-          },
-        };
-
-        const response = await POSTMethod<AlertApiResponse>(
-          API_ENDPOINTS.END_POINT_ALERT_HANDLER,
-          { data: JSON.stringify(payload) }
-        );
-
-        if (response.success && response.data?.status?.statusCode === 200) {
-          setDataProvider(prev =>
-            prev.cloneWithRows(response.data.data?.content ?? [])
-          );
-        } else {
-          Alert.alert('Error', response.error || 'Unable to fetch alerts');
-        }
-      } catch (err: any) {
-        setError(err);
-        Alert.alert('Error', err.message || 'Something went wrong');
-      } finally {
-        setLoading(false);
+  /* 🔹 Fetch alerts when screen is focused */
+  useFocusEffect(
+    useCallback(() => {
+      if (!loginName || !apiKey) {
+        return () => {};
       }
-    };
 
-    fetchAlerts();
-  }, [loginName, apiKey]);
+      let isActive = true;
+
+      const fetchAlerts = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+
+          const payload = {
+            info: {
+              actionType: 'showall',
+              platformType: 'android',
+              type: 'android',
+              outputType: 'json',
+              currentDateTime:
+                Utilities.getCurrentDateAndTimeInUTC(),
+              currentTimezone:
+                Utilities.getCurrentTimeZone(),
+            },
+            data: {
+              content: { apiKey, loginName },
+            },
+          };
+
+          const response = await POSTMethod<AlertApiResponse>(
+            API_ENDPOINTS.END_POINT_ALERT_HANDLER,
+            payload
+          );
+
+          if (
+            isActive &&
+            response.success &&
+            response.data?.status?.statusCode === 200
+          ) {
+            const alerts =
+              response.data?.data?.content ?? [];
+
+            setDataProvider(prev =>
+              prev.cloneWithRows(alerts)
+            );
+          } else if (isActive) {
+            Alert.alert(
+              'Error',
+              response.error || 'Unable to fetch alerts'
+            );
+          }
+        } catch (err: any) {
+          if (isActive) {
+            setError(err);
+            Alert.alert(
+              'Error',
+              err.message || 'Something went wrong'
+            );
+          }
+        } finally {
+          isActive && setLoading(false);
+        }
+      };
+
+      fetchAlerts();
+
+      /* cleanup on blur */
+      return () => {
+        isActive = false;
+      };
+    }, [loginName, apiKey])
+  );
 
   return {
     dataProvider,
@@ -161,11 +195,9 @@ export const deleteAlertById = async (alertID: number) => {
       },
     };
 
-    const response = await POSTMethod(
+    const response = await POSTMethod<AlertApiResponse>(
       API_ENDPOINTS.END_POINT_ALERT_HANDLER,
-      {
-        data: JSON.stringify(requestPayload),
-      }
+      requestPayload
     );
 
     if (response.success && response.data?.status?.statusCode === 200) {
@@ -179,3 +211,7 @@ export const deleteAlertById = async (alertID: number) => {
     throw error;
   }
 };
+
+function fetchAlerts() {
+  throw new Error('Function not implemented.');
+}

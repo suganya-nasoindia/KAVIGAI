@@ -1,46 +1,46 @@
 import { useEffect, useState,useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Todo } from './TodoModel';
-import { fetchTodos } from './TodoService';
+import { Goal } from './GoalModel';
+import { fetchGoals } from './GoalService';
 
 export type FilterType =  'current' | 'skipped' | 'future';
 
-export function useTodoController() {
+export function useGoalController() {
   const { apiKey, accessToken, loginName } = useSelector(
     (state: any) => state.auth
   );
 
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [filteredTodos, setFilteredTodos] = useState<Todo[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [filteredGoals, setFilteredGoals] = useState<Goal[]>([]);
   const [filter, setFilter] = useState<FilterType>('current');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
 
   useEffect(() => {
-    loadTodos();
+    loadGoals();
   }, []);
 
   const applyFilter = useCallback((type: FilterType) => {
    
     const map = {
-      current: (t: Todo) => t.dateInterval === 0,
-      skipped: (t: Todo) => t.dateInterval < 0,
-      future:  (t: Todo) => t.dateInterval > 0,
+      current: (t: Goal) => t.dateInterval === 0,
+      skipped: (t: Goal) => t.dateInterval < 0,
+      future:  (t: Goal) => t.dateInterval > 0,
     };
-    setFilteredTodos(todos.filter(map[type]));
-  }, [todos]);
+    setFilteredGoals(goals.filter(map[type]));
+  }, [goals]);
 
   useEffect(() => {
     applyFilter(filter);
   }, [filter, applyFilter]);
 
-  async function loadTodos() {
+  async function loadGoals() {
     try {
       setLoading(true);
-      const data = await fetchTodos({ apiKey, accessToken, loginName });
-      console.log('Todos fetched:', data);
-      setTodos(data);
+      const data = await fetchGoals({ apiKey, accessToken, loginName });
+      console.log('Goals fetched:', data);
+      setGoals(data);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -55,8 +55,8 @@ export function useTodoController() {
     error,
     filter,
     setFilter,
-    todos: filteredTodos,
-    reload: loadTodos,
+    goals: filteredGoals,
+    reload: loadGoals,
   };
 }
 

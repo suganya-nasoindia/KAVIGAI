@@ -1,33 +1,44 @@
 import React from 'react';
-import { Image, Alert,SafeAreaView, StyleSheet } from 'react-native';
+import { Image, SafeAreaView, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 
 // import TodayScreen from '../today';
 // import TodoScreen from '../todo';
 // import ServicesScreen from '../services';
-import TodoScreen from '../Todo/TodoListScreen';
-import TodayScreen from '../Today/TodayView';
+import TodoStackNavigator from '../Todo/TodoStackNavigator';
+import TodayStackNavigator from '../Today/TodayStackNavigator';
 import ServicesStackNavigator from '../ServicesHome/ServicesStackNavigator';
+import GoalStackNavigator from '../Goals/GoalStackNavigator';
 /* =========================
    MODEL
 ========================= */
 
 const TABS = [
+
+
+
+  9
   {
     name: 'Today',
     icon: require('../../assets/today.png'),
-    component: TodayScreen,
+    component: TodayStackNavigator,
   },
   {
     name: 'Todo',
     icon: require('../../assets/todo.png'),
-    component: TodoScreen,
+    component: TodoStackNavigator,
   },
+  
   {
     name: 'Services',
     icon: require('../../assets/services.png'),
     component: ServicesStackNavigator,
+  },
+  {
+    name: 'Goals',
+    icon: require('../../assets/goal.png'),
+    component: GoalStackNavigator,
   },
 ] as const;
 

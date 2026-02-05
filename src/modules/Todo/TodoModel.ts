@@ -6,7 +6,7 @@ export interface Goal {
   }
   
   export interface Todo {
-    todoID: number;
+    ID: number;
     name: string;
     type:string,
     description: string;

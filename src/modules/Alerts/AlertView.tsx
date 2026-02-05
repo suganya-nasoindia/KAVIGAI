@@ -25,9 +25,6 @@ type AppStackParamList = {
   AlertDetails: { alertId: number };
 };
 
-// type NavigationProp =
-//   NativeStackNavigationProp<AppStackParamList, 'Alerts'>;
-
 /* =========================
    ROW COMPONENT
 ========================= */
@@ -69,29 +66,28 @@ const AlertRow = ({ item, onPress }: AlertRowProps) => (
 
 export default function AlertView() {
   const navigation =
-  useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+    useNavigation<NativeStackNavigationProp<AppStackParamList>>();
 
-  const { dataProvider, layoutProvider, loading, error } =
-    useAlertController();
+  // ✅ CALL HOOK ONLY ONCE
+  const {
+    dataProvider,
+    layoutProvider,
+    loading,
+    error,
+    fetchAlerts,
+  } = useAlertController();
 
-    // useFocusEffect(
-    //   React.useCallback(() => {
-    //     fetchAlerts();
-    //   }, [])
-    // );
   const onAlertPress = (item: AlertItem) => {
-    console.log('Alert pressed:', item);
-    console.log('Navigating to AlertDetails with ID:', item.alertNotificationID);
     if (!item.alertNotificationID) return;
+
     navigation.navigate('AlertDetails', {
       alertId: item.alertNotificationID,
     });
   };
 
-  const rowRenderer = (_: number, item: AlertItem) => {
-    console.log('ROW ITEM:', item.alertNotificationID);
-    return <AlertRow item={item} onPress={onAlertPress} />;
-  };
+  const rowRenderer = (_: number, item: AlertItem) => (
+    <AlertRow item={item} onPress={onAlertPress} />
+  );
 
   if (loading) {
     return (
@@ -116,6 +112,13 @@ export default function AlertView() {
     return (
       <View style={styles.noAlertsContainer}>
         <Text style={styles.emptyText}>No Alerts available.</Text>
+
+        {/* Optional manual refresh */}
+        <TouchableOpacity onPress={fetchAlerts}>
+          <Text style={{ color: '#498ABF', marginTop: 10 }}>
+            Tap to refresh
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -130,6 +133,7 @@ export default function AlertView() {
     </View>
   );
 }
+
 
 /* =========================
    STYLES

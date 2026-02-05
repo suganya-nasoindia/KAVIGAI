@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useLayoutEffect} from 'react';
 import { useDispatch } from 'react-redux';
 import { setSelectedService } from '../../redux/slices/serviceSlice';
 
@@ -22,8 +22,17 @@ const { height } = Dimensions.get('window');
 const ServicesHomeScreen: React.FC<Props> = ({ navigation }) => {
   const { services, getServiceIcon } = useServicesController();
   const dispatch = useDispatch();
-
-
+  navigation.setOptions({
+    headerShown: true,
+    title: 'Services',
+    headerStyle: {
+      backgroundColor: '#498ABF',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: '200',
+    },
+  });
   const navigateToService = (type: string) => {
     console.log('Navigating to service:', type);
     switch (type) {

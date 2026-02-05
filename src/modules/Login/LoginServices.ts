@@ -13,8 +13,12 @@ export const LoginService = {
       content: {
         loginName: username,
         password: password,
+        organizationName: "Kavigai",
+        serverURL:"",
         gpsCoordinate: "",
         ipaddress: "",
+        SID: "",
+        deviceToken:"",
       },
     };
 
@@ -23,6 +27,8 @@ export const LoginService = {
     const response = await POSTMethod<LoginResponse>(ApiEndpoints.LOGIN, {
       data: JSON.stringify(body),
     });
+
+    console.log('LOGIN RAW RESPONSE 👉', response);
 
     if (!response.data) {
       throw new Error("Login response data is undefined");

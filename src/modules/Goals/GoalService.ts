@@ -1,17 +1,17 @@
 import { POSTMethod } from "../../services/api/ApiClient";
 import API_ENDPOINTS  from "../../services/api/endpoints";
 import Utilities from '../../Components/Utilities';
-import { Todo } from './TodoModel';
+import { Goal } from './GoalModel';
 
-interface FetchTodoParams {
+interface FetchGoalParams {
   apiKey: string;
   accessToken: string;
   loginName: string;
 }
 
-export async function fetchTodos(
-  params: FetchTodoParams
-): Promise<Todo[]> {
+export async function fetchGoals(
+  params: FetchGoalParams
+): Promise<Goal[]> {
 
   const body = {
     data: JSON.stringify({
@@ -19,41 +19,45 @@ export async function fetchTodos(
         actionType: 'showall',
         platformType: 'android',
         outputType: 'json',
+        action:"showall",
+        type:"",
+        role:"",
         currentDateTime: Utilities.getCurrentDateAndTimeInUTC(),
         currentTimezone: Utilities.getCurrentTimeZone(),
       },
-      data: { loginName: params.loginName },
+      data: {
+        content:{}},
     }),
   };
 
-  const response = await POSTMethod(API_ENDPOINTS.END_POINT_GET_TODO_HANDLER, body);
-  console.log('Fetch Todos Response:', response);
+  const response = await POSTMethod(API_ENDPOINTS.END_POINT_GET_GOAL_HANDLER, body);
+  console.log('Fetch Goals Response:', response);
   if (response?.data?.status?.statusCode !== 200) {
-    throw new Error(response?.data?.status?.message || 'Failed to fetch todos');
+    throw new Error(response?.data?.status?.message || 'Failed to fetch goals');
   }
 
   //const todos = response?.data?.data?.content?.todo ?? [];
 
-  const todos = Array.isArray(response?.data?.data?.content)
+  const goals = Array.isArray(response?.data?.data?.content)
     ? response.data.data.content
     : [];
-  console.log('Parsed Todos:', todos);
+  console.log('Parsed Goals:', goals);
 
-  return todos.map((item: any) => ({
+  return goals.map((item: any) => ({
     ...item,
     dateInterval: Utilities.calculateDateInterval(
       Utilities.getCurrentDateAndTimeInUTC(),
-      item.beginDate,
-      item.endDate
+      item.goalBeginDate,
+      item.goalEndDate
     ),
   }));
 }
 
-export async function fetchTodoById(
-  todoID: number,
-  params: FetchTodoParams
-): Promise<Todo | null> {
-console.log('Fetching Todo with ID:', todoID);
+export async function fetchGoalById(
+  goalID: number,
+  params: FetchGoalParams
+): Promise<Goal | null> {
+console.log('Fetching Goal with ID:', goalID);
   const body = {
     data: JSON.stringify({
       info: {
@@ -63,7 +67,7 @@ console.log('Fetching Todo with ID:', todoID);
       },
       data: {
         content: {
-          ID: todoID,
+          ID: goalID,
           loginName: params.loginName,
           apiKey: params.apiKey,
         },
@@ -72,7 +76,7 @@ console.log('Fetching Todo with ID:', todoID);
   };
 
   const response = await POSTMethod(
-    API_ENDPOINTS.END_POINT_GET_TODO_HANDLER,
+    API_ENDPOINTS.END_POINT_GET_GOAL_HANDLER,
     body
   );
 
@@ -82,19 +86,19 @@ console.log('Fetching Todo with ID:', todoID);
     );
   }
 
-  const todo =
+  const goal =
     Array.isArray(response?.data?.data?.content)
       ? response.data.data.content[0]
       : null;
 
-  if (!todo) return null;
+  if (!goal) return null;
 
   return {
-    ...todo,
+    ...goal,
     dateInterval: Utilities.calculateDateInterval(
       Utilities.getCurrentDateAndTimeInUTC(),
-      todo.beginDate,
-      todo.endDate
+      goal.goalBeginDate,
+      goal.goalEndDate
     ),
   };
 }

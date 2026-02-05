@@ -11,7 +11,8 @@ import { primaryHeaderOptions } from '../themes/navigation';
 import TodayScreen from '../modules/Today/TodayView';
 import TodoScreen from '../modules/Todo/TodoListScreen';
 import ServicesHomeScreen from '../modules/ServicesHome/ServicesHomeScreen';
-import EventList from '../modules/Events/EventList';
+import TodoDetailsScreen from '../modules/Todo/TodoDetailScreen';
+import AddTodo from '../modules/Todo/AddTodo';
 
 
 const Stack = createNativeStackNavigator();
@@ -22,22 +23,9 @@ export default function AppStack() {
             <Stack.Screen
                 name="Home"
                 component={HomeScreen}
-                options={({ navigation }) => ({
-                    title: 'Home',
-                    ...primaryHeaderOptions,
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Alerts')}
-                            style={{ marginRight: 15 }}
-                        >
-                            <Image
-                                source={require('../assets/alerts.png')}
-                                style={styles.icon}
-                            />
-                        </TouchableOpacity>
-                    ),
-                })}
-
+                options={{
+                   headerShown: false,
+                }}
             />
             <Stack.Screen
                 name="Profile"
@@ -78,19 +66,32 @@ export default function AppStack() {
                 ...primaryHeaderOptions,
             }} />
             <Stack.Screen
-                name="EventList"
-                component={EventList}
-                options={{  headerShown: false,
-                    title: 'Events',
+                name="TodoDetails"
+                component={TodoDetailsScreen}
+                options={{
+                    title: 'Todo Details',
                     ...primaryHeaderOptions,
-                 }}
+                }}
+            />
+            <Stack.Screen
+                name="AddTodo"
+                component={AddTodo}
+                options={{
+                    title: 'Add Todo Details',
+
+                    ...primaryHeaderOptions,
+                }}
             />
 
-            <Stack.Screen name="Today" component={TodayScreen} options={{
-                headerShown: false,
-                title: 'Today',
-                ...primaryHeaderOptions,
-            }} />
+            <Stack.Screen
+                name="Today"
+                component={TodayScreen}
+                options={{
+                    title: 'Today',
+                    ...primaryHeaderOptions,
+                }}
+            />
+
             <Stack.Screen name="Todo" component={TodoScreen} options={{
                 headerShown: false,
                 title: 'Todo',

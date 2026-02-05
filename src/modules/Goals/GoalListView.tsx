@@ -16,20 +16,20 @@ import {
 } from 'recyclerlistview';
 
 
-import { useTodoController, FilterType } from './useTodoController';
-import { Todo } from './TodoModel';
+import { useGoalController, FilterType } from './GoalController';
+import { Goals } from './GoalModel';
 import ButtonComponent from '../../Components/ButtonComponent';
 
 const { width } = Dimensions.get('window');
 
 
-const TodoScreen = () => {
+const GoalListScreen = () => {
 
   const navigation = useNavigation<any>();
   
   navigation.setOptions({
     headerShown: true,
-    title: 'Todo',
+    title: 'Goals',
     headerStyle: {
       backgroundColor: '#498ABF',
     },
@@ -40,7 +40,7 @@ const TodoScreen = () => {
   });
 
   // const { todos, loading, error, filter, reload } = useTodoController();
-  const { todos, loading, error, filter, reload, setFilter } = useTodoController();
+  const { goals, loading, error, filter, reload, setFilter } = useGoalController();
   const ViewTypes = {
     NORMAL: 'NORMAL',
     GOAL: 'GOAL',
@@ -48,9 +48,9 @@ const TodoScreen = () => {
 
 
   console.log('Active filter:', filter);
-  console.log('Todos received:', todos.length);
-  console.log('todos length:', todos.length);
-  console.log('all todos:', todos);
+  console.log('Goals received:', goals.length);
+  console.log('todos length:', goals.length);
+  console.log('all todos:', goals);
 
   /* ---------------- DATA PROVIDER ---------------- */
   const [dataProvider, setDataProvider] = useState(
@@ -60,20 +60,20 @@ const TodoScreen = () => {
 
   const counts = useMemo(() => {
     return {
-      current: todos.filter(t => t.dateInterval === 0).length,
-      skipped: todos.filter(t => t.dateInterval < 0).length,
-      future: todos.filter(t => t.dateInterval > 0).length,
+      current: goals.filter(t => t.dateInterval === 0).length,
+      skipped: goals.filter(t => t.dateInterval < 0).length,
+      future: goals.filter(t => t.dateInterval > 0).length,
     };
-  }, [todos]);
+  }, [goals]);
 
   useEffect(() => {
     setDataProvider(prev =>
-      prev.cloneWithRows(Array.isArray(todos) ? todos : [])
+      prev.cloneWithRows(Array.isArray(goals) ? goals : [])
     );
-  }, [todos]);
+  }, [goals]);
 
   useEffect(() => {
-    if (todos.length === 0) {
+    if (goals.length === 0) {
       reload();   // force reload
     }
   }, [])
@@ -84,7 +84,7 @@ const TodoScreen = () => {
     () =>
       new LayoutProvider(
         (index) => {
-          const item = dataProvider.getDataForIndex(index) as Todo;
+          const item = dataProvider.getDataForIndex(index) as Goals;
           const hasGoal =
             Boolean(item.goalID) ||
             (Array.isArray(item.goals) && item.goals.length > 0);
@@ -92,7 +92,7 @@ const TodoScreen = () => {
           return hasGoal ? ViewTypes.GOAL : ViewTypes.NORMAL;
         },
         (type, dim, index) => {
-          const item = dataProvider.getDataForIndex(index) as Todo;
+          const item = dataProvider.getDataForIndex(index) as Goals;
           dim.width = width;
           dim.height = calculateRowHeight(item);
 
@@ -111,7 +111,7 @@ const TodoScreen = () => {
 
 
   /* ---------------- ROW RENDERER ---------------- */
-  const rowRenderer = (_: string, item: Todo) => {
+  const rowRenderer = (_: string, item: Goals) => {
     const hasGoal =
       Boolean(item.goalID) ||
       (Array.isArray(item.goals) && item.goals.length > 0);
@@ -120,18 +120,15 @@ const TodoScreen = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          // console.log('Todo pressed:', item.ID)
-          navigation.navigate('TodoDetails', {
-            todoID: item.ID,
+          // console.log('Goal pressed:', item.ID)
+          navigation.navigate('GoalDetails', {
+            goalID: item.GoalID,
             // pass only ID
           })
         }
       >
-        {hasGoal ? (
-          <GoalTodoItem item={item} />
-        ) : (
-          <NormalTodoItem item={item} />
-        )}
+     <GoalItem item={item} />
+
       </TouchableOpacity>
     );
   };
@@ -141,9 +138,9 @@ const TodoScreen = () => {
   const LINE_HEIGHT = 15;
   const BASE_PADDING = 25;
 
-  const calculateRowHeight = (item: Todo) => {
-    const titleLines = Math.ceil((item.name?.length ?? 0) / 25);
-    const descLines = Math.ceil((item.description?.length ?? 0) / 45);
+  const calculateRowHeight = (item: Goals) => {
+    const titleLines = Math.ceil((item.goalName?.length ?? 0) / 25);
+    const descLines = Math.ceil((item.goaldescription?.length ?? 0) / 45);
 
     let height =
       BASE_PADDING +
@@ -206,7 +203,7 @@ const TodoScreen = () => {
       <TouchableOpacity
         style={styles.fab}
 
-        onPress={() => navigation.getParent()?.navigate('AddTodo')
+        onPress={() => navigation.getParent()?.navigate('AddGoal')
         }
       >
         <Text style={styles.fabIcon}>＋</Text>
@@ -217,30 +214,19 @@ const TodoScreen = () => {
   );
 };
 
-export default TodoScreen;
+export default GoalListScreen;
 
 /* ================================================= */
 /* ================= ROW COMPONENTS ================= */
 /* ================================================= */
 
-const GoalTodoItem = ({ item }: { item: Todo }) => (
-  <View style={[styles.card, styles.goalCard]}>
-    <Text style={styles.title}>{item.name}</Text>
 
-    <Text style={styles.description} numberOfLines={2}>
-      {item.description}
-    </Text>
 
-    <Text style={styles.goalText}>
-      🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
-    </Text>
-  </View>
-);
-
-const NormalTodoItem = ({ item }: { item: Todo }) => (
+const GoalItem = ({ item }: { item: Goals }) => (
   <View style={styles.card}>
     <Text style={styles.title}>{item.name}</Text>
-
+    <Text style={styles.description} numberOfLines={2}>
+    {item.goalBeginDate} - {item.goalEndDate}</Text>
     <Text style={styles.description} numberOfLines={2}>
       {item.description}
     </Text>

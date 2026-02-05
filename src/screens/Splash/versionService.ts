@@ -39,11 +39,13 @@ export const checkAppVersion = async (
       },
     };
 
+    console.log(payload)
     // Make API call
     const response = await POSTMethod<VersionCheckResponse>(
       API_ENDPOINTS.VERSION_CHECK,
       payload
     );
+    console.log('Version Check Response:', response);
 
     if (response.success) {
       // Save version info locally
