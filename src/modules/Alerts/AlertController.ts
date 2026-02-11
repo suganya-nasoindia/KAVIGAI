@@ -39,92 +39,78 @@ export const useAlertController = () => {
   );
 
   /* 🔹 Load auth ONCE */
-  useEffect(() => {
-    const loadAuth = async () => {
-      const name = await AsyncStorage.getItem('LOGIN_NAME');
-      const key = await AsyncStorage.getItem('API_KEY');
-
-      setLoginName(name?.trim() || '');
-      setApiKey(key?.trim() || '');
-    };
-
-    loadAuth();
-  }, []);
-
+  // useEffect(() => {
+  //   const loadAuth = async () => {
+  //     const storedAuth = await AsyncStorage.getItem('AUTH_DATA');
+  //     console.log('Loaded auth data from AsyncStorage:', storedAuth);
+  //     if (storedAuth) {
+  //       const authData = JSON.parse(storedAuth);
+  //       console.log('Parsed auth data:', authData);
+  //       setLoginName(authData.loginName?.trim() || '');
+  //       setApiKey(authData.apiKey?.trim() || '');
+  //     }
+  //   };
+  
+  //   loadAuth();
+  // }, []);
+  
   /* 🔹 Fetch alerts when screen is focused */
   useFocusEffect(
     useCallback(() => {
-      if (!loginName || !apiKey) {
-        return () => {};
-      }
-
       let isActive = true;
-
+  
       const fetchAlerts = async () => {
         try {
           setLoading(true);
           setError(null);
-
+  
+          const storedAuth = await AsyncStorage.getItem('AUTH_DATA');
+          if (!storedAuth) return;
+  
+          const { loginName, apiKey } = JSON.parse(storedAuth);
+  
           const payload = {
             info: {
               actionType: 'showall',
               platformType: 'android',
               type: 'android',
               outputType: 'json',
-              currentDateTime:
-                Utilities.getCurrentDateAndTimeInUTC(),
-              currentTimezone:
-                Utilities.getCurrentTimeZone(),
+              currentDateTime: Utilities.getCurrentDateAndTimeInUTC(),
+              currentTimezone: Utilities.getCurrentTimeZone(),
             },
             data: {
               content: { apiKey, loginName },
             },
           };
-
-          const response = await POSTMethod<AlertApiResponse>(
+  
+          const response = await POSTMethod(
             API_ENDPOINTS.END_POINT_ALERT_HANDLER,
-            payload
+            {
+              data: JSON.stringify(payload),
+            }
           );
-
-          if (
-            isActive &&
-            response.success &&
-            response.data?.status?.statusCode === 200
-          ) {
-            const alerts =
-              response.data?.data?.content ?? [];
-
-            setDataProvider(prev =>
-              prev.cloneWithRows(alerts)
-            );
-          } else if (isActive) {
-            Alert.alert(
-              'Error',
-              response.error || 'Unable to fetch alerts'
-            );
+          
+          console.log("Alert API response:", response);
+  
+          if (isActive && response.success && response.statusCode === 200) {
+            const alerts = response.data?.data?.content ?? [];
+            setDataProvider(prev => prev.cloneWithRows(alerts));
           }
         } catch (err: any) {
-          if (isActive) {
-            setError(err);
-            Alert.alert(
-              'Error',
-              err.message || 'Something went wrong'
-            );
-          }
+          if (isActive) setError(err);
         } finally {
-          isActive && setLoading(false);
+          if (isActive) setLoading(false);
         }
       };
-
+  
       fetchAlerts();
-
-      /* cleanup on blur */
+  
       return () => {
         isActive = false;
       };
-    }, [loginName, apiKey])
+    }, [])
   );
-
+    
   return {
     dataProvider,
     layoutProvider,

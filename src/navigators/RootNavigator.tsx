@@ -44,8 +44,9 @@ export default function RootNavigator() {
     {!isReady && (
       <Stack.Screen name="Splash" component={SplashScreen} />
     )}
+      {/* <Stack.Screen name="AppStack" component={AppStack} /> */}
 
-    {isLoggedIn ? (
+    {(!isFirstTime) && (isLoggedIn) ? (
       <Stack.Screen name="AppStack" component={AppStack} />
     ) : (
       <Stack.Screen name="AuthStack" component={AuthStack} />

@@ -12,7 +12,6 @@ import {
 import { RecyclerListView } from 'recyclerlistview';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
 import { useAlertController } from './AlertController';
 import type { AlertItem } from './AlertModel';
 
@@ -20,7 +19,8 @@ import type { AlertItem } from './AlertModel';
    NAVIGATION TYPES
 ========================= */
 
-type AppStackParamList = {
+type TodayStackParamList = {
+  Today: undefined;
   Alerts: undefined;
   AlertDetails: { alertId: number };
 };
@@ -66,17 +66,16 @@ const AlertRow = ({ item, onPress }: AlertRowProps) => (
 
 export default function AlertView() {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AppStackParamList>>();
-
+    useNavigation<NativeStackNavigationProp<TodayStackParamList>>();
+console.log('Rendering AlertView');
   // ✅ CALL HOOK ONLY ONCE
   const {
     dataProvider,
     layoutProvider,
     loading,
     error,
-    fetchAlerts,
   } = useAlertController();
-
+console.log('DataProvider size:', dataProvider.getSize());
   const onAlertPress = (item: AlertItem) => {
     if (!item.alertNotificationID) return;
 
@@ -114,11 +113,11 @@ export default function AlertView() {
         <Text style={styles.emptyText}>No Alerts available.</Text>
 
         {/* Optional manual refresh */}
-        <TouchableOpacity onPress={fetchAlerts}>
+        {/* <TouchableOpacity onPress={fetchAlerts}>
           <Text style={{ color: '#498ABF', marginTop: 10 }}>
             Tap to refresh
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }

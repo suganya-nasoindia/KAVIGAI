@@ -2,8 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import GoalListView from './GoalListView';
-import GoalDetailsScreen from './GoalDetailsScreen';
-import AddGoalsScreen from './AddGoalsScreen';
+// import GoalDetailsScreen from './GoalDetailsScreen';
+// import AddGoalsScreen from './AddGoalsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,14 +14,14 @@ const TodoStackNavigator = () => {
                 name="GoalList"
                 component={GoalListView}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
                 name="GoalDetails"
                 component={GoalDetailsScreen}
             />
             <Stack.Screen
                 name="AddGoal"
                 component={AddGoalsScreen}
-            />
+            /> */}
     
         </Stack.Navigator>
     );

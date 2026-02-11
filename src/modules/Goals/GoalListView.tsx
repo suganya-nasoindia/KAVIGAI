@@ -112,10 +112,7 @@ const GoalListScreen = () => {
 
   /* ---------------- ROW RENDERER ---------------- */
   const rowRenderer = (_: string, item: Goals) => {
-    const hasGoal =
-      Boolean(item.goalID) ||
-      (Array.isArray(item.goals) && item.goals.length > 0);
-
+  
     return (
       <TouchableOpacity
         activeOpacity={0.8}
@@ -135,7 +132,7 @@ const GoalListScreen = () => {
 
 
 
-  const LINE_HEIGHT = 15;
+  const LINE_HEIGHT = 25;
   const BASE_PADDING = 25;
 
   const calculateRowHeight = (item: Goals) => {
@@ -152,7 +149,7 @@ const GoalListScreen = () => {
       height += 40;
     }
 
-    return Math.max(height, 80); // minimum height
+    return Math.max(height, 60); // minimum height
   };
 
 
@@ -224,11 +221,11 @@ export default GoalListScreen;
 
 const GoalItem = ({ item }: { item: Goals }) => (
   <View style={styles.card}>
-    <Text style={styles.title}>{item.name}</Text>
+    <Text style={styles.title}>{item.goalName}</Text>
     <Text style={styles.description} numberOfLines={2}>
     {item.goalBeginDate} - {item.goalEndDate}</Text>
     <Text style={styles.description} numberOfLines={2}>
-      {item.description}
+      {item.goalDescription}
     </Text>
   </View>
 );

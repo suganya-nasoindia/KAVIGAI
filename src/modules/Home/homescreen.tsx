@@ -16,9 +16,6 @@ import GoalStackNavigator from '../Goals/GoalStackNavigator';
 
 const TABS = [
 
-
-
-  9
   {
     name: 'Today',
     icon: require('../../assets/today.png'),
@@ -43,9 +40,7 @@ const TABS = [
 ] as const;
 
 /* =========================
-   CONTROLLER
-========================= */
-
+   CONTROLLER*/
 const useHomeController = () => {
   const getIconForRoute = (routeName: string) => {
     return TABS.find(tab => tab.name === routeName)?.icon;

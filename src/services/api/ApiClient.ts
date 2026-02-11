@@ -17,23 +17,30 @@ const BASE_URL = "https://api.kavigai.com/api/v1/index.php/";
 /** ------------------------------------
  *  GET TOKEN & APIKEY FROM STORAGE
 -------------------------------------*/
-const getAuthHeaders = async () => {
-  const storedAuth = await AsyncStorage.getItem("AUTH_DATA");
-  let authData = null;
-  if (storedAuth) {
-     authData = JSON.parse(storedAuth);
+const getAuthHeaders = async (): Promise<HeadersType> => {
+  try {
+    const storedAuth = await AsyncStorage.getItem("AUTH_DATA");
 
-    console.log("LOGIN SUCCESSFUL", authData);
-    console.log("Auth Token:", authData.accessToken);
+    if (!storedAuth) {
+      return {};
+    }
+
+    const authData = JSON.parse(storedAuth);
+    const token = authData?.accessToken;
+
+    if (!token) {
+      return {};
+    }
+
+    return {
+      Authorization: `Bearer ${token.trim()}`,
+    };
+  } catch (error) {
+    console.log("Error reading auth headers:", error);
+    return {};
   }
-  const token = authData.accessToken;
-
-  if (!token) return {};
-
-  return {
-    Authorization: `Bearer ${token.trim()}`,
-  };
 };
+
 
 /** ------------------------------------
  *  POST METHOD
@@ -41,12 +48,17 @@ const getAuthHeaders = async () => {
 export const POSTMethod = async <T>(
   endpoint: string,
   body: any,
-  customHeaders: HeadersType = {}
+  customHeaders: HeadersType = {},
+  requireAuth: boolean = true   // ✅ new flag (default true)
 ): Promise<ApiResponse<T>> => {
   console.log("POSTMethod called with endpoint:", endpoint);
   console.log("Request body:", body);
   try {
-    const authHeaders = await getAuthHeaders();
+      let authHeaders: HeadersType = {};
+
+    if (requireAuth) {
+      authHeaders = await getAuthHeaders();
+    }
 
     const headers: HeadersType = {
       "Content-Type": "application/json",

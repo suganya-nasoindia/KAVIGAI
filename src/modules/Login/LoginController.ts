@@ -33,7 +33,8 @@ export const useLoginController = (navigation: any) => {
       ====================== */
       const response = await LoginService.login(username, password);
       const statusCode = response?.status?.statusCode;
-
+      console.log("Login Response:", response); 
+      console.log("Login Status Code:", statusCode);
       if (statusCode !== 200) {
         Alert.alert(
           "Login Failed",
@@ -65,8 +66,9 @@ export const useLoginController = (navigation: any) => {
           firstTime,
         })
       );
-      console.log("LOGIN SUCCESSFUL", AsyncStorage.getItem("AUTH_DATA"));
-      /* ======================
+      const saved = await AsyncStorage.getItem("AUTH_DATA");
+      console.log("LOGIN SUCCESSFUL", saved);
+            /* ======================
          3️⃣ USER INFO
       ====================== */
       const userInfoResponse = await UserInfoService.fetchUserInfo();
@@ -117,8 +119,9 @@ export const useLoginController = (navigation: any) => {
         JSON.stringify(payload)
       );
 
-      console.log("USER INFO FETCH SUCCESSFUL", AsyncStorage.getItem("USER_PROFILE"));
-
+      const userprofilesaved = await AsyncStorage.getItem("USER_PROFILE");
+      console.log("USERPROFILE SUCCESSFUL", userprofilesaved);
+      
       /* ======================
          5️⃣ NAVIGATION
       ====================== */

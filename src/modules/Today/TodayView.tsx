@@ -1,18 +1,17 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useMemo, useState,useLayoutEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
   ActivityIndicator,
   Dimensions,
   Image,
-  StyleSheet,TouchableOpacity,
+  StyleSheet,
   LayoutChangeEvent,
 } from 'react-native';
 
 import {
   RecyclerListView,
-  DataProvider,
   LayoutProvider,
 } from 'recyclerlistview';
 
@@ -31,38 +30,6 @@ const TodayScreen = () => {
   //console.log(navigation.getState().routeNames);
   console.log(navigation.getParent()?.getState().routeNames);
   
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      title: 'Today',
-      headerStyle: {
-        backgroundColor: '#498ABF',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: '200',
-      },
-      headerRight: () => (
-        <TouchableOpacity
-        onPress={() => navigation.getParent()?.navigate('Alerts')}
-        style={{ marginRight: 15 }}
-        >
-          <Image
-            source={require('../../assets/alerts.png')}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-  //     // 🔹 Optional cleanup when leaving tab
-  //     return () => {
-  //       navigation.getParent()?.setOptions({
-  //         headerRight: undefined,
-  //       });
-  //     };
-  //   }, [navigation])
-  // );
 
   const { dataProvider, pieData, loading, error } = useTodayController();
 
@@ -196,7 +163,7 @@ const TodayScreen = () => {
           </Text>
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
-          </Text>
+          </Text> 
         </View>
       </View>
     </View>

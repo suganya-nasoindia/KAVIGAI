@@ -56,16 +56,7 @@ export default function AppStack() {
                         </TouchableOpacity>
                     ),
                 })} />
-            <Stack.Screen name="Alerts" component={AlertView} options={{
-                title: 'Alerts',
-                ...primaryHeaderOptions,
-            }} />
-            <Stack.Screen name="AlertDetails" component={AlertDetailsScreen} options={{
-                headerShown: true,
-                title: 'Alert Details',
-                ...primaryHeaderOptions,
-            }} />
-            <Stack.Screen
+                       <Stack.Screen
                 name="TodoDetails"
                 component={TodoDetailsScreen}
                 options={{

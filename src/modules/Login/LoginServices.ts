@@ -19,15 +19,15 @@ export const LoginService = {
         ipaddress: "",
         SID: "",
         deviceToken:"",
-      },
+      },  
     };
 
     console.log("Sending Login Request Body:", body);
 
     const response = await POSTMethod<LoginResponse>(ApiEndpoints.LOGIN, {
-      data: JSON.stringify(body),
-    });
-
+      data: JSON.stringify(body)
+    },{},false);
+    console.log('LOGIN REQUEST 👉',""+JSON.stringify(body));
     console.log('LOGIN RAW RESPONSE 👉', response);
 
     if (!response.data) {
