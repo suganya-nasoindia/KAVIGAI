@@ -180,6 +180,8 @@ const Constants = {
     TOS_URL: 'https://app.kavigai.com/assets/terms_of_service.html',
     HELP_URL: 'https://app.kavigai.com/assets/help.html',
     TAKE_A_TOUR_URL: "https://kavigai.com/home/",
+    APP_SERVER_IMAGE_UPLOAD_BASE_URL: 'https://api.kavigai.com:443/uploads/',  // From .env
+
      X_AUTH_TOKEN :"X-Auth-Token",
      AUTHORIZATION:"Authorization"
 

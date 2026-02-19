@@ -1,70 +1,110 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useEffect, useState, useMemo,useLayoutEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
-  Text, TouchableOpacity,
+  Image,
+  Text,
+  TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import {
   RecyclerListView,
   DataProvider,
   LayoutProvider,
 } from 'recyclerlistview';
 
-
-import { useTodoController, FilterType } from './useTodoController';
+import { useTodoController } from './useTodoController';
 import { Todo } from './TodoModel';
 import ButtonComponent from '../../Components/ButtonComponent';
 
 const { width } = Dimensions.get('window');
 
+/* ================================================= */
+/* ================= SAFE IMAGE ==================== */
+/* ================================================= */
+
+const SafeImage = ({ item }: { item: Todo }) => {
+  const isValidUrl =
+    item.imageUrl &&
+    item.imageUrl.trim() !== '' &&
+    item.imageUrl !== 'null';
+
+  const source = isValidUrl
+    ? { uri: encodeURI(item.imageUrl.trim()) }
+    : require('../../assets/todo.png');
+
+  return (
+    <Image
+      source={source}
+      style={[
+        styles.image,
+        !isValidUrl && { tintColor: '#555' },
+      ]}
+      resizeMode="contain"
+    />
+  );
+}
+
+/* ================================================= */
+/* ================= ROW COMPONENTS ================= */
+/* ================================================= */
+
+const GoalTodoItem = ({ item }: { item: Todo }) => (
+  <View style={[styles.card, styles.goalCard]}>
+    <SafeImage item={item} />
+    <Text style={styles.title}>{item.name}</Text>
+ <Text style={styles.timestamp}>
+            {item.beginDate && item.endDate
+              ? `${item.beginDate} - ${item.endDate}`
+              : 'No Date'}
+          </Text>
+    <Text style={styles.description} numberOfLines={2}>
+      {item.description}
+    </Text>
+
+    <Text style={styles.goalText}>
+      🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
+    </Text>
+  </View>
+);
+
+const NormalTodoItem = ({ item }: { item: Todo }) => (
+  <View style={styles.card}>
+    <SafeImage item={item} />
+    <Text style={styles.title}>{item.name}</Text>
+ <Text style={styles.timestamp}>
+            {item.beginDate && item.endDate
+              ? `${item.beginDate} - ${item.endDate}`
+              : 'No Date'}
+          </Text>
+    <Text style={styles.description} numberOfLines={2}>
+      {item.description}
+    </Text>
+  </View>
+);
+
+/* ================================================= */
+/* ================= TODO SCREEN =================== */
+/* ================================================= */
 
 const TodoScreen = () => {
-
   const navigation = useNavigation<any>();
-  
-  navigation.setOptions({
-    headerShown: true,
-    title: 'Todo',
-    headerStyle: {
-      backgroundColor: '#498ABF',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      fontWeight: '200',
-    },
-  });
 
-  // const { todos, loading, error, filter, reload } = useTodoController();
-  const { todos, loading, error, filter, reload, setFilter } = useTodoController();
+  const { todos, loading, error, filter, reload, setFilter } =
+    useTodoController();
+
   const ViewTypes = {
     NORMAL: 'NORMAL',
     GOAL: 'GOAL',
   };
 
-
-  console.log('Active filter:', filter);
-  console.log('Todos received:', todos.length);
-  console.log('todos length:', todos.length);
-  console.log('all todos:', todos);
-
   /* ---------------- DATA PROVIDER ---------------- */
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => r1 !== r2)
   );
-
-
-  const counts = useMemo(() => {
-    return {
-      current: todos.filter(t => t.dateInterval === 0).length,
-      skipped: todos.filter(t => t.dateInterval < 0).length,
-      future: todos.filter(t => t.dateInterval > 0).length,
-    };
-  }, [todos]);
 
   useEffect(() => {
     setDataProvider(prev =>
@@ -74,16 +114,46 @@ const TodoScreen = () => {
 
   useEffect(() => {
     if (todos.length === 0) {
-      reload();   // force reload
+      reload();
     }
-  }, [])
+  }, []);
 
+  /* ---------------- COUNT CALCULATION ---------------- */
+  const counts = useMemo(() => {
+    return {
+      current: todos.filter(t => t.dateInterval === 0).length,
+      skipped: todos.filter(t => t.dateInterval < 0).length,
+      future: todos.filter(t => t.dateInterval > 0).length,
+    };
+  }, [todos]);
+
+  /* ---------------- HEIGHT CALCULATION ---------------- */
+
+  const LINE_HEIGHT = 15;
+  const BASE_PADDING = 40;
+
+  const calculateRowHeight = (item: Todo) => {
+    const titleLines = Math.ceil((item.name?.length ?? 0) / 25);
+    const descLines = Math.ceil((item.description?.length ?? 0) / 45);
+
+    let height =
+      BASE_PADDING +
+      titleLines * LINE_HEIGHT +
+      descLines * LINE_HEIGHT;
+
+    if (item.goalID || (item.goals && item.goals.length > 0)) {
+      height += 40;
+    }
+
+    return Math.max(height, 100);
+  };
 
   /* ---------------- LAYOUT PROVIDER ---------------- */
+
   const layoutProvider = useMemo(
     () =>
       new LayoutProvider(
-        (index) => {
+        index => {
           const item = dataProvider.getDataForIndex(index) as Todo;
           const hasGoal =
             Boolean(item.goalID) ||
@@ -95,22 +165,13 @@ const TodoScreen = () => {
           const item = dataProvider.getDataForIndex(index) as Todo;
           dim.width = width;
           dim.height = calculateRowHeight(item);
-
-          // switch (type) {
-          //   case ViewTypes.GOAL:
-          //     dim.height = 120;   // taller
-          //     break;
-          //   case ViewTypes.NORMAL:
-          //   default:
-          //     dim.height = 85;    // shorter
-          // }
         }
       ),
     [dataProvider]
   );
 
-
   /* ---------------- ROW RENDERER ---------------- */
+
   const rowRenderer = (_: string, item: Todo) => {
     const hasGoal =
       Boolean(item.goalID) ||
@@ -120,10 +181,8 @@ const TodoScreen = () => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          // console.log('Todo pressed:', item.ID)
           navigation.navigate('TodoDetails', {
             todoID: item.ID,
-            // pass only ID
           })
         }
       >
@@ -136,31 +195,8 @@ const TodoScreen = () => {
     );
   };
 
-
-
-  const LINE_HEIGHT = 15;
-  const BASE_PADDING = 25;
-
-  const calculateRowHeight = (item: Todo) => {
-    const titleLines = Math.ceil((item.name?.length ?? 0) / 25);
-    const descLines = Math.ceil((item.description?.length ?? 0) / 45);
-
-    let height =
-      BASE_PADDING +
-      titleLines * LINE_HEIGHT +
-      descLines * LINE_HEIGHT;
-
-    // extra height if goal exists
-    if (item.goalID || (item.goals && item.goals.length > 0)) {
-      height += 40;
-    }
-
-    return Math.max(height, 80); // minimum height
-  };
-
-
-
   /* ---------------- UI STATES ---------------- */
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -178,24 +214,25 @@ const TodoScreen = () => {
   }
 
   /* ---------------- MAIN UI ---------------- */
+
   return (
     <View style={styles.container}>
-      {/* 🔘 FILTER BUTTONS */}
       <ButtonComponent
         selectedFilter={filter}
         onPressCurrent={() => setFilter('current')}
         onPressSkipped={() => setFilter('skipped')}
         onPressPending={() => setFilter('future')}
-
         currentCount={counts.current}
         skippedCount={counts.skipped}
         pendingCount={counts.future}
         hideHeader={true}
       />
+
       {dataProvider.getSize() === 0 ? (
         <View style={styles.center}>
           <Text>No todos available.</Text>
-        </View>) : (
+        </View>
+      ) : (
         <RecyclerListView
           dataProvider={dataProvider}
           layoutProvider={layoutProvider}
@@ -205,47 +242,15 @@ const TodoScreen = () => {
 
       <TouchableOpacity
         style={styles.fab}
-
-        onPress={() => navigation.getParent()?.navigate('AddTodo')
-        }
+        onPress={() => navigation.getParent()?.navigate('AddTodo')}
       >
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
-
     </View>
-
   );
 };
 
 export default TodoScreen;
-
-/* ================================================= */
-/* ================= ROW COMPONENTS ================= */
-/* ================================================= */
-
-const GoalTodoItem = ({ item }: { item: Todo }) => (
-  <View style={[styles.card, styles.goalCard]}>
-    <Text style={styles.title}>{item.name}</Text>
-
-    <Text style={styles.description} numberOfLines={2}>
-      {item.description}
-    </Text>
-
-    <Text style={styles.goalText}>
-      🎯 {item.goals?.[0]?.goalName ?? 'Goal'}
-    </Text>
-  </View>
-);
-
-const NormalTodoItem = ({ item }: { item: Todo }) => (
-  <View style={styles.card}>
-    <Text style={styles.title}>{item.name}</Text>
-
-    <Text style={styles.description} numberOfLines={2}>
-      {item.description}
-    </Text>
-  </View>
-);
 
 /* ================================================= */
 /* ===================== STYLES ==================== */
@@ -266,8 +271,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     marginHorizontal: 10,
-    marginVertical: 3,
-    padding: 10,
+    marginVertical: 5,
+    padding: 12,
     borderRadius: 10,
     elevation: 2,
   },
@@ -275,6 +280,13 @@ const styles = StyleSheet.create({
   goalCard: {
     borderLeftWidth: 4,
     borderLeftColor: '#36a2eb',
+  },
+  timestamp: { fontSize: 12, color: '#999' },
+
+  image: {
+    width: 75,
+    height: 75,
+    marginBottom: 8,
   },
 
   title: {
@@ -294,6 +306,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#646464',
   },
+
   fab: {
     position: 'absolute',
     bottom: 20,
@@ -310,9 +323,4 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
   },
-  icon: { width: 22, height: 22, tintColor: '#fff', resizeMode: 'contain', },
-  headerIcons: { flexDirection: 'row', alignItems: 'center', marginRight: 8, },
 });
-
-
-

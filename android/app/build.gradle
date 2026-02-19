@@ -85,6 +85,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    project.ext.react = [
+    enableHermes: true
+]
     signingConfigs {
         debug {
             storeFile file('debug.keystore')

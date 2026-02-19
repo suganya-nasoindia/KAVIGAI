@@ -1,13 +1,13 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { primaryHeaderOptions } from '../../themes/navigation';
 import GoalListView from './GoalListView';
 // import GoalDetailsScreen from './GoalDetailsScreen';
 // import AddGoalsScreen from './AddGoalsScreen';
 
 const Stack = createNativeStackNavigator();
 
-const TodoStackNavigator = () => {
+const GoalStackNavigator = () => {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen
@@ -27,4 +27,4 @@ const TodoStackNavigator = () => {
     );
 };
 
-export default TodoStackNavigator;
+export default GoalStackNavigator;

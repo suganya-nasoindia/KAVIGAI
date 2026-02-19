@@ -25,11 +25,12 @@ import { useNavigation } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 
 const TodayScreen = () => {
+  console.log("🔥 TodayScreen Rendered");
 
   const navigation = useNavigation();
   //console.log(navigation.getState().routeNames);
-  console.log(navigation.getParent()?.getState().routeNames);
-  
+  console.log("Navigation Routes",navigation.getParent()?.getState().routeNames);
+
 
   const { dataProvider, pieData, loading, error } = useTodayController();
 
@@ -87,6 +88,7 @@ const TodayScreen = () => {
 
   /* ---------------- PLACEHOLDER IMAGE ---------------- */
   const getPlaceHolderImage = (type?: string) => {
+    console.log("Type in getPlaceHolderImage:", type);
     switch (type) {
       case Constants.TODO_UC:
         return require('../../assets/todo.png');
@@ -105,11 +107,26 @@ const TodayScreen = () => {
 
   /* ---------------- SAFE IMAGE ---------------- */
   const SafeImage = ({ item }: { item: TodayItem }) => {
-    const source = item.imageUrl?.trim()
-      ? { uri: item.imageUrl.replace(/\s/g, '%20') }
+    console.log('SafeImage received item:', item);
+    console.log('Original imageUrl:', item.imageUrl);
+    const isValidUrl =
+      item.imageUrl &&
+      item.imageUrl.trim() !== '' &&
+      item.imageUrl !== 'null';
+    console.log('SafeImage URL:', item.imageUrl, 'isValid:', isValidUrl);
+    const source = isValidUrl
+      ? { uri: encodeURI(item.imageUrl) }
       : getPlaceHolderImage(item.type);
 
-    return <Image source={source} style={styles.icon} resizeMode="contain" />;
+    return (
+      <Image
+        source={source}
+        style={[
+          styles.image,
+          !isValidUrl && { tintColor: '#555' } // tint only placeholder
+        ]}        resizeMode="contain"
+      />
+    );
   };
 
   /* ---------------- GOAL ITEM ---------------- */
@@ -138,9 +155,9 @@ const TodayScreen = () => {
           style={styles.goalIcon}
         />
         <Text style={styles.goalText}>
-          {item.goals?.[0]?.goalName?.toUpperCase()}
+          {item.goalName?.toUpperCase()}
         </Text>
-        {item.goals?.[0]?.connectedStatus && (
+        {item.connectedStatus && (
           <View style={styles.statusIndicator} />
         )}
       </View>
@@ -163,7 +180,7 @@ const TodayScreen = () => {
           </Text>
           <Text style={styles.description} numberOfLines={2}>
             {item.description}
-          </Text> 
+          </Text>
         </View>
       </View>
     </View>
@@ -208,7 +225,6 @@ const TodayScreen = () => {
       {pieData.length > 0 && (
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Goal Summary</Text>
-          console.log('pieData 👉', pieData);
 
           <PieChart
             data={pieData}
@@ -217,13 +233,13 @@ const TodayScreen = () => {
             accessor="population"
             backgroundColor="transparent"
             paddingLeft="15"
-            absolute 
+            absolute
             chartConfig={{
               backgroundColor: '#fff',
               backgroundGradientFrom: '#fff',
               backgroundGradientTo: '#fff',
               color: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`,
-           labelColor: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 0) => `rgba(0, 0, 0, ${opacity})`,
             }}
           />
         </View>
@@ -266,7 +282,8 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row' },
 
-  icon: { width: 24, height: 24, marginRight: 12, tintColor:'#ffff'},
+  icon: { width: 50, height: 50, marginRight: 12, tintColor: '#ffff' },
+  image: { width: 75, height: 75, marginRight: 12 },
 
   textContainer: { flex: 1 },
 
@@ -287,6 +304,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'green',
     marginLeft: 6,
+    alignContent:'flex-end',
+    flexDirection:'row',
+    textAlign:'left'
   },
 
   chartContainer: {

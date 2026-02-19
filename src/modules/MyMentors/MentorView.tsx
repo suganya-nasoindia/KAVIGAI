@@ -1,24 +1,8 @@
 import React, { memo } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, ImageSourcePropType } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { MentorItem } from './MentorModel';
 
-// ----------------- TYPES -----------------
-export interface Mentor {
-  name: string;
-  title?: string;
-  description?: string;
-  tags?: string[];
-  firstName?: string;
-  lastName?: string;
-  rating?: number;
-  imageUrl?: string;
-  location?: string;
-  recognitions?: string;
-  price?: string;
-  gender?: string;
-}
-
-// ----------------- RATING COMPONENT -----------------
 interface RatingProps {
   value: number;
 }
@@ -39,85 +23,86 @@ const Rating: React.FC<RatingProps> = ({ value }) => {
   );
 };
 
-// ----------------- MENTOR CARD -----------------
 interface MentorCardProps {
-  mentor: Mentor;
+  mentor: MentorItem;
 }
 
 const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
-  const safeRating = Math.max(0, Math.min(5, Math.round(mentor.rating ?? 0)));
+  console.log('Rendering MentorCard for:', mentor.mentorTitle);
+  console.log('Ratings value:', mentor.ratings);
+  const safeRating = Math.max(0, Math.min(5, Math.round(mentor.ratings ?? 0)));
+
+  const imageSource: ImageSourcePropType = mentor.imageUrl
+    ? { uri: mentor.imageUrl }
+    : require('../../assets/mymentors.png');
 
   return (
     <View style={styles.card}>
       {/* LEFT SIDE */}
       <View style={styles.rowContent}>
-        <View style={styles.leftColumn}>
-          <Image
-            source={
-              mentor.imageUrl
-                ? { uri: mentor.imageUrl }
-                : require('../../assets/mymentors.png')
-            }
-            style={styles.image}
-          />
+      <View style={styles.leftColumn}>
+        <Image source={imageSource} style={styles.image} />
 
-          {mentor.rating == null ? (
-            <Text style={styles.noRating}>No rating yet</Text>
-          ) : (
-            <Rating value={safeRating} />
-          )}
+        {mentor.ratings == null ? (
+          <Text style={styles.noRating}>No rating yet</Text>
+        ) : (
+          <Rating value={safeRating} />
+        )}
+      </View>
+
+      {/* RIGHT SIDE */}
+      <View style={styles.rightColumn}>
+        <Text style={styles.title} numberOfLines={1}>
+          {mentor.mentorTitle}
+        </Text>
+
+        <Text style={styles.description} numberOfLines={3}>
+          {mentor.mentorDescription}
+        </Text>
+
+        <View style={styles.tagsContainer}>
+          {(mentor.mentorTags ?? []).map((tag: string, index: number) => (
+            <Text key={index} style={styles.tag}>
+              {tag.trim().toUpperCase()}
+            </Text>
+          ))}
         </View>
 
-        {/* RIGHT SIDE */}
-        <View style={styles.rightColumn}>
-          <Text style={styles.title} numberOfLines={1}>
-            {mentor.title ?? ''}
-          </Text>
+        <Text style={styles.meta}>{mentor.location}</Text>
+        <Text style={styles.meta}>{mentor.recognitions}</Text>
+      </View>
+      </View>
+      {/* FOOTER */}
+      <View style={styles.footer}>
+        <Text style={styles.price}>
+          {mentor.price?.toUpperCase?.() ?? ''}
+        </Text>
 
-          <Text style={styles.description} numberOfLines={3}>
-            {mentor.description ?? ''}
-          </Text>
+        <Text style={styles.name}>
+          {mentor.gender
+            ? `${mentor.firstName.toUpperCase() + " " + mentor.lastName.toUpperCase()}, ${mentor.gender}`
+            : mentor.firstName.toUpperCase() + " " + mentor.lastName.toUpperCase()}
+        </Text>
+      </View>
 
-          <View style={styles.tagsContainer}>
-            {(mentor.tags ?? []).map((tag, index) => (
-              <Text key={index} style={styles.tag}>
-                {tag.trim().toUpperCase()}
-              </Text>
-            ))}
-          </View>
-
-          <Text style={styles.meta}>{mentor.location ?? ''}</Text>
-          <Text style={styles.meta}>{mentor.recognitions ?? ''}</Text>
-        </View>
-        </View>
-
-        {/* FOOTER */}
-        <View style={styles.footer}>
-          <Text style={styles.price}>{mentor.price?.toUpperCase() ?? ''}</Text>
-          <Text style={styles.name}>
-            {`${mentor.firstName ?? ''} ${mentor.lastName ?? ''}${mentor.gender ? `, ${mentor.gender}` : ''}`}
-
-          </Text>
-        </View>
     </View>
   );
 };
 
 export default memo(MentorCard);
 
-// ----------------- STYLES -----------------
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    margin: 8,
-    padding: 12,
+    margin: 2,
+    padding: 5,
     borderRadius: 12,
     elevation: 3,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 4,
   },
-  rowContent: {
+  rowContent:{
     flexDirection: 'row',
 
   },
@@ -187,6 +172,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
@@ -197,6 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     color: '#333',
+    alignItems: 'flex-start',
   },
 
   name: {

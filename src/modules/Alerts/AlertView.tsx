@@ -75,7 +75,6 @@ console.log('Rendering AlertView');
     loading,
     error,
   } = useAlertController();
-console.log('DataProvider size:', dataProvider.getSize());
   const onAlertPress = (item: AlertItem) => {
     if (!item.alertNotificationID) return;
 

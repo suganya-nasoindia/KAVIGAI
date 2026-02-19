@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TouchableOpacity, Image,StyleSheet } from 'react-native';
+import { TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 
 import WelcomeCarouselScreen from '../screens/WelcomeCarousel/WelcomeCarouselScreen';
@@ -17,25 +17,21 @@ function HomeButton() {
   const navigation = useNavigation();
 
   const goToHome = () => {
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [
-          {
-            name: 'AppStack',
-            state: {
-             // index:0,
-              routes: [{ name: 'Home' }],
-            },
-          },
-        ],
-      })
-    );
+    navigation.getParent()?.navigate('AppStack', {
+      screen: 'Home',
+    });
+
+    // navigation.getParent()?.dispatch(
+    //   CommonActions.reset({
+    //     index: 0,
+    //     routes: [{ name: 'AppStack' }],
+    //   })
+    // );
   };
 
   return (
     <TouchableOpacity onPress={goToHome} style={{ marginLeft: 15 }}>
-    <Image source={require('../assets/home.png')} style={styles.icon} />
+      <Image source={require('../assets/home.png')} style={styles.icon} />
     </TouchableOpacity>
   );
 }
@@ -72,15 +68,15 @@ export default function AuthStack() {
           headerStyle: {
             backgroundColor: '#498ABF', // your app primary color
           },
-      
+
           // ✅ Title color
           headerTitleStyle: {
             color: '#FFFFFF',
           },
-      
+
           // ✅ Back arrow color (if shown)
           headerTintColor: '#FFFFFF',
-      
+
           headerRight: () => <HomeButton />,
         }}
       />
@@ -88,9 +84,9 @@ export default function AuthStack() {
   );
 }
 const styles = StyleSheet.create({
-    icon: {
-        width: 22,
-        height: 22,
-        tintColor: '#fff',
-    },
+  icon: {
+    width: 22,
+    height: 22,
+    tintColor: '#fff',
+  },
 });

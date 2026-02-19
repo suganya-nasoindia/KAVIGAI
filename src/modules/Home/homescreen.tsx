@@ -10,17 +10,18 @@ import TodoStackNavigator from '../Todo/TodoStackNavigator';
 import TodayStackNavigator from '../Today/TodayStackNavigator';
 import ServicesStackNavigator from '../ServicesHome/ServicesStackNavigator';
 import GoalStackNavigator from '../Goals/GoalStackNavigator';
+import MentorStackNavigator from '../MyMentors/MentorStackNavigator';
 /* =========================
    MODEL
 ========================= */
 
 const TABS = [
 
-  {
-    name: 'Today',
-    icon: require('../../assets/today.png'),
-    component: TodayStackNavigator,
-  },
+  // {
+  //   name: 'Today',
+  //   icon: require('../../assets/today.png'),
+  //   component: TodayStackNavigator,
+  // },
   {
     name: 'Todo',
     icon: require('../../assets/todo.png'),
@@ -36,6 +37,11 @@ const TABS = [
     name: 'Goals',
     icon: require('../../assets/goal.png'),
     component: GoalStackNavigator,
+  },
+  {
+    name: 'Mentor',
+    icon: require('../../assets/mymentors.png'),
+    component: MentorStackNavigator,
   },
 ] as const;
 
@@ -59,6 +65,8 @@ const Tab = createBottomTabNavigator();
 
 export default function HomeScreen() {
   const { getIconForRoute } = useHomeController();
+  console.log("🔥 HomeScreen Mounted");
+
   // console.log(
   //   .getParent('RootStack')?.getState().routeNames
   // );
@@ -67,7 +75,6 @@ export default function HomeScreen() {
 
   
   return (
-    <SafeAreaView style={styles.safeArea}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarShowIcon: true,
@@ -95,7 +102,6 @@ export default function HomeScreen() {
           />
         ))}
       </Tab.Navigator>
-    </SafeAreaView>
   );
 }
 
