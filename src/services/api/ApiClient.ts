@@ -177,3 +177,72 @@ export const PATCHMethod = async <T>(
 };
 
 
+/** ------------------------------------
+ *  PUT METHOD
+-------------------------------------*/
+export const PUTMethod = async <T>(
+  endpoint: string,
+  body: any,
+  customHeaders: HeadersType = {},
+  requireAuth: boolean = true   // same pattern as POST
+): Promise<ApiResponse<T>> => {
+  try {
+    let authHeaders: HeadersType = {};
+
+    if (requireAuth) {
+      authHeaders = await getAuthHeaders();
+    }
+
+    const headers: HeadersType = {
+      "Content-Type": "application/json",
+      ...authHeaders,
+      ...customHeaders,
+    };
+
+    const url = `${BASE_URL}${endpoint}`;
+
+    console.log("====== PUT REQUEST ======");
+    console.log("URL:", url);
+    console.log("Headers:", headers);
+    console.log("Body:", body);
+
+    const response = await fetch(url, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const text = await response.text();
+    console.log("====== RAW RESPONSE TEXT ======");
+    console.log(text);
+
+    const json = text ? JSON.parse(text) : {};
+
+    console.log("====== PARSED RESPONSE JSON ======");
+    console.log(json);
+
+    // ❌ HTTP ERROR
+    if (!response.ok) {
+      return {
+        success: false,
+        statusCode: response.status,
+        error: json?.message || json?.error || "Request failed",
+      };
+    }
+
+    // ✅ HTTP SUCCESS
+    return {
+      success: true,
+      statusCode: response.status,
+      data: json as T,
+    };
+
+  } catch (error: any) {
+    return {
+      success: false,
+      statusCode: 0,
+      error: error.message || "Network error",
+    };
+  }
+};
+

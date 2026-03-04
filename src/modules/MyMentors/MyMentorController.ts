@@ -22,7 +22,6 @@ interface ApiResponse<T> {
    FUNCTION
 ========================= */
 
-
 export const getMentorList = async (): Promise<MentorItem[]> => {
   try {
     const mentorRequestBody = {
@@ -30,7 +29,7 @@ export const getMentorList = async (): Promise<MentorItem[]> => {
         info: {
           type: 'android',
           actionType: 'showall',
-          platformType: 'aandroid',
+          platformType: 'android',
           outputType: 'json',
           action: 'showall',
           role: null,

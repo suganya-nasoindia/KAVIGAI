@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // ----------------- TYPES -----------------
@@ -42,12 +42,15 @@ const Rating: React.FC<RatingProps> = ({ value }) => {
 // ----------------- MENTOR CARD -----------------
 interface MentorCardProps {
   mentor: Mentor;
+  onPress: () => void;   // 👈 ADD THIS
+
 }
 
-const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
+const MentorCard: React.FC<MentorCardProps> = ({ mentor,onPress }) => {
   const safeRating = Math.max(0, Math.min(5, Math.round(mentor.rating ?? 0)));
 
   return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
     <View style={styles.card}>
       {/* LEFT SIDE */}
       <View style={styles.rowContent}>
@@ -100,6 +103,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor }) => {
           </Text>
         </View>
     </View>
+    </TouchableOpacity>
   );
 };
 

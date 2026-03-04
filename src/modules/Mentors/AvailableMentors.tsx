@@ -4,8 +4,11 @@ import { View, Text, TextInput, ActivityIndicator, FlatList } from 'react-native
 import MentorCard from './MentorCard';
 import { getAvailableMentors } from './MentorController';
 import type { Mentor } from './MentorModel';
+import { useNavigation } from '@react-navigation/native';
 
 const AvailableMentorList: React.FC = () => {
+  const navigation = useNavigation<any>();
+
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +36,12 @@ const AvailableMentorList: React.FC = () => {
     );
   }, [query, mentors]);
 
+  const handleMentorPress = (mentor: Mentor) => {
+    console.log('Navigating to mentor details for:', mentor);
+    navigation.navigate('AvailableMentorsDetail', {
+      mentor: mentor,
+    });
+  };
   if (loading) {
     return <ActivityIndicator size="large" />;
   }
@@ -48,7 +57,11 @@ const AvailableMentorList: React.FC = () => {
       <FlatList
         data={filteredMentors}
         keyExtractor={item => item.mentorID.toString()}
-        renderItem={({ item }) => <MentorCard mentor={item} />}
+        renderItem={({ item }) =>
+        (<MentorCard mentor={item}
+          onPress={() => handleMentorPress(item)}
+
+        />)}
         ListEmptyComponent={<Text>No mentors found</Text>}
       />
     </View>
